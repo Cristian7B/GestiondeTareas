@@ -20,7 +20,7 @@ Este programa te permitirá gestionar tus tareas académicas de manera personali
 
 ## 💻 Tecnologías Utilizadas
 
-- Python
+- C++
 - Persistencia de datos
 - Interfaz de línea de comandos (CLI)
 
