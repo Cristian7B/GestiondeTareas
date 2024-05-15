@@ -38,6 +38,6 @@ Este programa te permitirá gestionar tus tareas académicas de manera personali
 
 Este proyecto está bajo la Licencia [MIT](LICENSE).
 
-![Ejemplo](diagrama.png)
+![Ejemplo](https://github.com/Cristian7B/GestiondeTareas/blob/main/Diagrama.png)
 
 
