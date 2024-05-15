@@ -38,3 +38,6 @@ Este programa te permitirá gestionar tus tareas académicas de manera personali
 
 Este proyecto está bajo la Licencia [MIT](LICENSE).
 
+![Ejemplo](diagrama.png)
+
+
