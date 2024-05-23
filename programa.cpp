@@ -58,7 +58,7 @@ void tareasFecha( Tarea &tarea);
 
 //Funciones adicionales
 int obtenercodigo();
-string crearCodigo(Cursos &curso;
+string crearCodigo(Cursos &curso);
 string validarcorreo(string correo);
 int obtnerAnio();
 int obtenerMes(int anio);
@@ -150,7 +150,7 @@ void registrarEstudiante(Estudiante &estudiante){
 
 
     cout << "Ingresa tu correo: ";
-    estudiante.correo = validarcorreo(string correo);
+    estudiante.correo = obtenercorreo();
 
     estudiante.codigo = obtenercodigo();
 
@@ -256,34 +256,64 @@ int obtenercodigo(){
     return codigo;
 }
 
-string validarcorreo(string correo){
-    char arroba="@", punto=".";
-    do{
-        cin>>correo;
-        for (int i = 0; i < correo.length(); i++){
-            if (correo[i] == arroba){
-                for (int j = i; j < correo.length(); j++){
-                    if (correo[j] == punto){
-                        break;
-                    }
-                }
+bool validarcorreo(string correo){
+    string arroba="@";
+	string punto=".";
+	string espacio=" ";
+	bool var=false;
+	int condicion,cantidad=100;
+
+    int cantletras=correo.length();
+    for (int i=0;i<cantletras;i++){
+    	if (correo[i]==espacio[0]){
+    		condicion=1;
+    		break;
+		}else{
+			condicion=0;
+		}
+	}
+	if (condicion == 0){
+        for (int i = 0; i < cantletras; i++){
+            if (correo[i] == arroba[0]){
+            	if (i==0){		//Arroba no puede ser inicio del correo
+            		break;
+				}else{
+	                for (int j = i; j < cantletras; j++){	//El for empieza a contar desde la posicion del arroba hasta encontrar un punto
+	                    if (correo[j] == punto[0]){
+	                    		
+	                    	if (j-i<=1){	//El arroba y el punto no pueden ir seguidos
+	                    		break;
+							}else{
+								if (cantletras-1!=j){
+									var=true;
+	                    			break;
+								}
+								
+							}
+	                        
+	                    }
+	                }
+	            }
             }
         }
-        cout<<"Este correo no es válido, ingrese uno nuevo por favor: ";
-    }while (true);
-        
-    return correo;
+    }else{
+	}
+	return var;    
 }
-
-string crearCodigo(Cursos & curso){
-    string codigo= curso.nombre + to_string(curso.cantidad);
-
-    //Incrementar la cantidad de tareas
-    curso.cantidad++;
-
-    return codigo;
+string obtenercorreo (){
+	string correo;
+	int contador=0;
+	do{
+		if (contador==0){
+			cout<<"Ingrese correo: ";
+		}else{
+			cout<<"El correo no es válido, vuelva a ingresar el correo: ";
+		}
+		cin>>correo;
+		contador++;
+	}while (!validarcorreo(correo));
+	return correo;
 }
-
 int obtnerAnio(){
     int anio;
     string respuesta;
