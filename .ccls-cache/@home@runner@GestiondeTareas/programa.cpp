@@ -35,12 +35,9 @@ struct Tarea {
     string descripcion;
     string codigoTarea;
     string estado;//En proceso, entregada y no entregada
+    string dia;
+    string mes;
     Cursos materia;
-
-    //Fecha de entrega
-    int dia;
-    int mes;
-    int anio;
 };
 
 //Prototipado de funciones
@@ -61,8 +58,8 @@ void tareasFecha( Tarea &tarea);
 
 //Funciones adicionales
 int obtenercodigo();
-string crearCodigo(Cursos &curso);
-bool validarcorreo(string correo);
+string crearCodigo(Cursos &curso;
+string validarcorreo(string correo);
 int obtnerAnio();
 int obtenerMes(int anio);
 int obtenerDia(int mes, int anio);
@@ -110,11 +107,10 @@ main() {
         switch (opcion)
         {
         case 1:
-            //Crear función para solicitar curso
             break;
         
         case 2:
-            crearNTareas(tareas, cantidadTareas);
+            crearNTareas(tareas);
             break;
         
         case 3:
@@ -154,7 +150,7 @@ void registrarEstudiante(Estudiante &estudiante){
 
 
     cout << "Ingresa tu correo: ";
-    estudiante.correo = obtenercorreo();
+    estudiante.correo = validarcorreo(string correo);
 
     estudiante.codigo = obtenercodigo();
 
@@ -210,16 +206,8 @@ void crearTarea(Cursos &curso, Tarea tareas[], int cantidadTareas){
     
     tarea.estado = "En proceso";
     
-    //Solicitar fecha de entrega
-    tarea.anio = obtnerAnio();
-    tarea.mes = obtenerMes(tarea.anio);
-    tarea.dia = obtenerDia(tarea.mes, tarea.anio);
     
-    //Añadir a la lista de tareas
-    tareas[cantidadTareas] = tarea;
-
     cantidadTareas++;
-
 }
 
 void crearNTareas(Tarea tareas[100], int cantidadTareas){
@@ -237,10 +225,13 @@ void crearNTareas(Tarea tareas[100], int cantidadTareas){
         cout << "Ingresa el código de la tarea: ";
         cin >> tareas[contadorTarea].codigoTarea;
         
-        //Solicitar fecha de entrega
-        tareas[contadorTarea].anio = obtnerAnio();
-        tareas[contadorTarea].mes = obtenerMes(tareas[contadorTarea].anio);
-        tareas[contadorTarea].dia = obtenerDia(tareas[contadorTarea].mes, tareas[contadorTarea].anio);
+        cout << "Ingresa el día de la tarea: ";
+        cin >> tareas[contadorTarea].dia;
+        
+        cout << "Ingresa el mes de la tarea: ";
+        cin >> tareas[contadorTarea].mes;
+        contadorTarea++;
+        cantidadTareas++;
         
         cout << "¿Desea agregar otra tarea? s/n: ";
         cin >> repeticion;
@@ -265,86 +256,56 @@ int obtenercodigo(){
     return codigo;
 }
 
-bool validarcorreo(string correo){
-    string arroba="@";
-	string punto=".";
-	string espacio=" ";
-	bool var=false;
-	int condicion,cantidad=100;
-
-    int cantletras=correo.length();
-    for (int i=0;i<cantletras;i++){
-    	if (correo[i]==espacio[0]){
-    		condicion=1;
-    		break;
-		}else{
-			condicion=0;
-		}
-	}
-	if (condicion == 0){
-        for (int i = 0; i < cantletras; i++){
-            if (correo[i] == arroba[0]){
-            	if (i==0){		//Arroba no puede ser inicio del correo
-            		break;
-				}else{
-	                for (int j = i; j < cantletras; j++){	//El for empieza a contar desde la posicion del arroba hasta encontrar un punto
-	                    if (correo[j] == punto[0]){
-	                    		
-	                    	if (j-i<=1){	//El arroba y el punto no pueden ir seguidos
-	                    		break;
-							}else{
-								if (cantletras-1!=j){
-									var=true;
-	                    			break;
-								}
-								
-							}
-	                        
-	                    }
-	                }
-	            }
+string validarcorreo(string correo){
+    char arroba="@", punto=".";
+    do{
+        cin>>correo;
+        for (int i = 0; i < correo.length(); i++){
+            if (correo[i] == arroba){
+                for (int j = i; j < correo.length(); j++){
+                    if (correo[j] == punto){
+                        break;
+                    }
+                }
             }
         }
-    }else{
-	}
-	return var;    
+        cout<<"Este correo no es válido, ingrese uno nuevo por favor: ";
+    }while (true);
+        
+    return correo;
 }
-string obtenercorreo (){
-	string correo;
-	int contador=0;
-	do{
-		if (contador==0){
-			cout<<"\nIngrese correo: ";
-		}else{
-			cout<<"\nEl correo no es válido, vuelva a ingresar el correo: ";
-		}
-		cin>>correo;
-		contador++;
-	}while (!validarcorreo(correo));
-	return correo;
+
+string crearCodigo(Cursos & curso){
+    string codigo= curso.nombre + to_string(curso.cantidad);
+
+    //Incrementar la cantidad de tareas
+    curso.cantidad++;
+
+    return codigo;
 }
+
 int obtnerAnio(){
     int anio;
     string respuesta;
 
     //Preguntar si la fecha de entrega es este año
-    cout << "\n¿La tarea se entrega este año? s/n: ";
+    cout << "¿La tarea se entrega este año? s/n: ";
     cin >> respuesta;
     
     while(respuesta != "s" && respuesta != "n"){
-        cout << "\nDigite 's' o 'n', ningún otro valor: ";
+        cout << "Digite 's' o 'n', ningún otro valor: ";
         cin >> respuesta;
     }
 
     if (respuesta == "s"){
         anio = 2024;
     }else{
-        cout << "\nIngrese el año de entrega: ";
+        cout << "Ingrese el año de entrega: ";
         cin >> anio;
         while (cin.fail() || anio < 2023){
             cin.clear();
             cin.ignore();
-            cout << "\nIngrese una año que aún no haya pasado, intente nuevamente: ";
+            cout << "Ingrese una año que aún no haya pasado, intente nuevamente: ";
             cin >> anio;
         }
     }
@@ -354,65 +315,30 @@ int obtnerAnio(){
 
 int obtenerMes(int anio){
     int mes;
-    int mesMinimo= 1;
+    int mesMinimo= 0;
     string meses[12] = {"Enero", "Febrero", "Marzo", "Abril", "Mayo","Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"};
 
-    cout << "\nSeleccione el mes de entrega: \n";
+    cout << "Seleccione el mes de entrega: \n";
     for (int i= 0; i< 12; i++){
         cout << i+1 << ". " << meses[i] << "\n";
     }
 
-    cout << "\nIngrese el número del mes: ";
+    cout << "Ingrese el número del mes: ";
+    cin >> mes;
     //Si el año es 2024, el mes debe ser mayor a 5
     if (anio == 2024){
         mesMinimo = 5;
-        cout << "(recuerda que el mes de entrega debe partir desde junio)";
-    }   
-    cin >> mes;
+        cout << "Recuerda que el mes de entrega debe partir desde junio";
+    }
     
     while (cin.fail() || mes < mesMinimo || mes > 12){
         cin.clear();
         cin.ignore();
-        cout << "\nIngrese un mes válido, solo el  número. Intente nuevamente: ";
+        cout << "Ingrese un mes válido, solo el  número. Intente nuevamente: ";
     }
 
     return mes;
 }
 int obtenerDia(int mes, int anio){
-    int dia, maximoDia;
-
-    //Establecer día en la que acaba el mes
-    switch (mes){
-        case 1:
-        case 3:
-        case 5:
-        case 7:
-        case 8:
-        case 10:
-        case 12:
-            maximoDia = 31;
-            break;
-        case 2:
-            //Revisar si es bisiesto
-            if(anio % 4){
-                maximoDia = 29;
-            }else{
-                maximoDia = 28;
-            }
-            break;
-        default:
-            maximoDia = 30;//30 para los demás meses
-    }
-
-    cout << "\nAhora ingrese el día de entrega de la tarea";
-    cin >> dia;
-
-    while (cin.fail() || dia < 1 || dia > maximoDia){
-        cin.clear();
-        cin.ignore();
-        cout << "\nDebes ingresar un número entre 1 y " << maximoDia << ".Intenta nuevamente: ";
-        cin >> dia;
-    }
-
-    return dia;
+    int dia;
 }
