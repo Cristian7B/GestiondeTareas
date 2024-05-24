@@ -162,8 +162,7 @@ void registrarEstudiante(Estudiante &estudiante) {
     cin >> estudiante.apellido;
 
     estudiante.correo = obtenerCorreo();
-
-
+  
     estudiante.codigo = obtenercodigo();
 
     registrarMaterias(estudiante);
@@ -473,7 +472,6 @@ bool validarcorreo(string correo){
 	}
 	return var;    
 }
-
 string crearCodigo(Estudiante &estudiante, string cursoNombre, Cursos materias[]){
     int i;
     string codigo= cursoNombre + to_string(cursoNombre[0]);
@@ -490,6 +488,7 @@ string crearCodigo(Estudiante &estudiante, string cursoNombre, Cursos materias[]
 }
 
 int obtenerAnio(){
+
     int anio;
     string respuesta;
 
