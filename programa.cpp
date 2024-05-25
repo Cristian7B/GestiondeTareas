@@ -8,7 +8,7 @@ Fecha: 5 de Junio
 #include <iostream>
 #include <locale.h>
 #include <string>
-
+#include <iomanip>
 using namespace std;
 
 
@@ -17,6 +17,7 @@ struct Cursos {
     string nombre;
     string codigo;
     int cantidad;
+    int cantidadMaterias;
 };
 
 //Crear estudiante
@@ -26,7 +27,7 @@ struct Estudiante {
     string apellido;
     string correo;
     Cursos materias[15];
-    int numMateriasInscritas; //Para conocer la cantidad de materias registradas
+    int numMateriasInscritas; 
 };
 
 //Datos de las tareas
@@ -34,49 +35,52 @@ struct Tarea {
     string nombre;
     string descripcion;
     string codigoTarea;
+    string curso;
     string estado;//En proceso, entregada y no entregada
-    Cursos materia;
-
-    //Fecha de entrega
     int dia;
     int mes;
     int anio;
+    Cursos materia;
 };
 
-//Prototipado de funciones
-void crearEstudianteCursos(Estudiante &es, Cursos materias[], int contador);
+// Prototipado de funciones
 void registrarEstudiante(Estudiante &estudiante);
-void registrarMaterias(Estudiante &estudiante);
+void registrarMaterias(Estudiante &estudiante); 
 
-//Funciones de las tareas
-void crearTarea(Cursos &curso, Tarea tareas[], int cantidadTareas);
-void crearNTareas(Tarea tareas[], int cantidadTareas);
-void modificarTarea( Tarea &tarea );
-void eliminarTarea( Tarea &tarea, int contadorTarea);
-void estadoTarea( Tarea &tarea );
+// Funciones de las tareas
+int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea);
+int crearNTareas(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea);
+void modificarTarea(Tarea &tarea);
+void eliminarTarea(Tarea &tarea, int contadorTarea);
+void estadoTarea(Tarea &tarea);
+void buscarFechaTarea(Tarea tareas[], int contadorTarea);
 
-//Consultas
-void tareasMateria( Tarea &tarea);
-void tareasFecha( Tarea &tarea);
+// Consultas
+void tareasMateria(Tarea &tarea);
+void tareasFecha(Tarea &tarea);
 
-//Funciones adicionales
+// Funciones adicionales
 int obtenercodigo();
-string crearCodigo(Cursos &curso);
-bool validarcorreo(string correo);
-int obtnerAnio();
+int obtenerAnio();
 int obtenerMes(int anio);
 int obtenerDia(int mes, int anio);
 
+string obtenerCorreo();
+string crearCodigo(Estudiante &estudiante, string cursoNombre, Cursos materias[]);
+bool validarcorreo(string correo);
 
-main() {
+
+main() { 
+    //Vectorizacion de los struct
     Tarea tareas[100];
-    setlocale(LC_ALL, "spanish");
-
-    system("cls");
     Cursos materias[15];
     Estudiante perfil;
 
-    int cantidadTareas = 0, contadorMateria = 0, opcion = 0;
+    setlocale(LC_ALL, "spanish");
+    system("cls");
+    
+    //Variales globales
+    int decision = 0, contadorMateria = 0, opcion = 0, contadorTarea = 0;
 
     cout << "¡Bienvenido a tu sistema de gestion de tareas personal!\n";
 
@@ -86,15 +90,14 @@ main() {
     cout << "Es hora de registrar tu perfil.\n";
     registrarEstudiante(perfil);
 
-    //Menu de opciones
-    while (opcion == 0)
-    {    
-        system("CLS");      
+    // Menú de opciones
+    while (decision == 0) {
+        system("CLS");
         cout << "Menú de tareas.\n";
         cout << "\nEdición\n";
         cout << "--------------------\n";
-        cout << "\t 1. Crear tarea.\n";    
-        cout << "\t 2. Crear n tareas tarea.\n";
+        cout << "\t 1. Crear tarea.\n";
+        cout << "\t 2. Crear n tareas.\n";
         cout << "\t 3. Modificar tarea.\n";
         cout << "\t 4. Cambiar estado de tarea.\n";
         cout << "\t 5. Eliminar tarea.\n";
@@ -102,66 +105,70 @@ main() {
         cout << "--------------------\n";
         cout << "\t 6. Consultar el historial de tareas de una materia.\n";
         cout << "\t 7. Consultar tareas para una fecha específica.\n";
-        cout << "Salir del programa.\n";
+        cout << "\n0. Salir del programa.\n";
 
         cout << "\nOpcion: ";
         cin >> opcion;
 
-        switch (opcion)
-        {
-        case 1:
-            //Crear función para solicitar curso
-            break;
-        
-        case 2:
-            crearNTareas(tareas, cantidadTareas);
-            break;
-        
-        case 3:
-            break;
-        
-        case 4:
-            break;
-        
-        case 5:
-            break;
-        
-        case 6:
-            break;
-        
-        case 7:
-            opcion = 1;
-            break;
-        
-        default:
-            break;
+        switch (opcion) {
+            case 1:
+                contadorTarea = crearTarea(perfil, tareas, materias, contadorTarea);
+                system("pause");
+                break;
+
+            case 2:
+                contadorTarea = crearNTareas(perfil, tareas, materias, contadorTarea);
+                system("pause");
+                break;
+
+            case 3:
+                break;
+
+            case 4:
+                break;
+
+            case 5:
+                break;
+
+            case 6:
+                break;
+
+            case 7:
+                buscarFechaTarea(tareas, contadorTarea);
+                break;
+
+            case 0:
+                decision = 1;
+                break;
+
+            default:
+                cout << "\nDigite una opción válida.";
+                break;
         }
     }
+
 }
 
-//Funciones
-void registrarEstudiante(Estudiante &estudiante){
-    //Solicitar nombre, apellido, correo y codigo
+// Funciones
+void registrarEstudiante(Estudiante &estudiante) {
+    // Solicitar nombre, apellido, correo y codigo
     cout << "--------------------\n";
     cout << "Datos personales.\n";
-    
-    cout << "Ingresa tu nombre: ";
-    cin >> estudiante.nombre;
 
+    cout << "Ingresa tu nombre: ";
+    getline(cin, estudiante.nombre);
 
     cout << "Ingresa tu apellido: ";
     cin >> estudiante.apellido;
 
-
-    cout << "Ingresa tu correo: ";
-    estudiante.correo = obtenercorreo();
-
+    estudiante.correo = obtenerCorreo();
+  
     estudiante.codigo = obtenercodigo();
 
     registrarMaterias(estudiante);
 }
 
-void registrarMaterias(Estudiante &estudiante){
+void registrarMaterias(Estudiante &estudiante) { 
     string continuar;
     int numMateriasRegistradas = 0;
 
@@ -169,88 +176,220 @@ void registrarMaterias(Estudiante &estudiante){
     cout << "--------------------";
     cout << "\nEs momento de registrar tus materias.\n";
 
-    //Solicitar los datos de las materias inscritas
-    while (continuar != "n" && numMateriasRegistradas < 15){
-        cout << "\nIngresa el nombre de la materia: ";
-        cin >> estudiante.materias[numMateriasRegistradas].nombre;
-        cout << "\tLa materia se registro como " << estudiante.materias[numMateriasRegistradas].nombre;
+    // Solicitar los datos de las materias inscritas
+    while (continuar != "n" && estudiante.numMateriasInscritas < 15) {
 
-        cout << "\n\tAhora registra el código de la materia: ";
+        cin.ignore();
+
+        cout << "\nIngresa el nombre de la materia: ";
+        getline(cin, estudiante.materias[numMateriasRegistradas].nombre);
+
+        cout << "\tAhora registra el código de la materia: ";
         cin >> estudiante.materias[numMateriasRegistradas].codigo;
 
-        //Definir la cantidad de tareas para cada materia
+        cout << "\nLa materia se registró como " << estudiante.materias[numMateriasRegistradas].nombre << endl;
+        cout << "El código de " << estudiante.materias[numMateriasRegistradas].nombre << " es " << estudiante.materias[numMateriasRegistradas].codigo;
+
+
+
+        // Definir la cantidad de tareas para cada materia
         estudiante.materias[numMateriasRegistradas].cantidad = 0;
         numMateriasRegistradas++;
 
-        //Preguntar por si se quiere dejar de registrar materias
-        cout << "--------------------\n";
+        // Preguntar por si se quiere dejar de registrar materias
+        cout << "\n--------------------\n";
         cout << "¿Desea inscribir más materias? s/n: ";
         cin >> continuar;
 
-        while(continuar != "s" && continuar != "n"){
+        while (continuar != "s" && continuar != "n") {
             cout << "Digite 's' o 'n', ningún otro valor: ";
             cin >> continuar;
         }
-
     }
 
-    //Almacenar el número de materias registradas
-    estudiante.numMateriasInscritas = numMateriasRegistradas;
+
+    // Almacenar el número de materias registradas
+    estudiante.numMateriasInscritas += numMateriasRegistradas;
 }
 
-void crearTarea(Cursos &curso, Tarea tareas[], int cantidadTareas){
-    Tarea tarea;
-    cout << "Ingrese el nombre de la tarea: ";
-    cin >> tarea.nombre;
 
-    cout << "Añada la descripción de la tarea: ";
-    cin >> tarea.descripcion;
+int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea){
+    int i;
 
-    tarea.codigoTarea = crearCodigo(curso);
+    cin.ignore();
+    cout << "Tarea " << contadorTarea << endl;
+    cout << "--------------------\n";
+
+    cout << "Ingresa el nombre de la tarea: ";
+    getline(cin, tareas[contadorTarea].nombre);
     
-    tarea.estado = "En proceso";
-    
-    //Solicitar fecha de entrega
-    tarea.anio = obtnerAnio();
-    tarea.mes = obtenerMes(tarea.anio);
-    tarea.dia = obtenerDia(tarea.mes, tarea.anio);
-    
-    //Añadir a la lista de tareas
-    tareas[cantidadTareas] = tarea;
+    cout << "Ingresa la descripción de la tarea: ";
+    getline(cin, tareas[contadorTarea].descripcion);
 
-    cantidadTareas++;
+    cout << "Ingrese el codigo del curso al que pertenece la materia, las materias son: \n";
+    cout << endl;
 
+    cout << left << setw(20) << "Materia" << setw(10) << "Codigo" << endl;
+    for(i = 0; i < estudiante.numMateriasInscritas ; i++) {
+        cout << setw(20) << left << estudiante.materias[i].nombre << setw(10) << left << estudiante.materias[i].codigo << endl;
+    }
+
+    cout << endl;
+
+    cin >> tareas[contadorTarea].curso;
+    
+    
+    cout << "\nFecha de entrega de la tarea.\n";
+    cout << "--------------------\n";
+
+    //Fechas
+    tareas[contadorTarea].anio = obtenerAnio();
+    tareas[contadorTarea].mes = obtenerMes(tareas[contadorTarea].anio);
+    tareas[contadorTarea].dia = obtenerDia(tareas[contadorTarea].mes, tareas[contadorTarea].anio);
+    tareas[contadorTarea].codigoTarea = crearCodigo(estudiante, tareas[contadorTarea].curso, materias);    
+
+    
+    tareas[contadorTarea].estado = "En proceso";
+
+    contadorTarea++;
+
+    for (i=0; i < contadorTarea; i++) {
+        cout << endl << "Nombre de la tarea "<< i+1 << ": " << tareas[i].nombre << endl;
+        cout << "Descripcion: " << tareas[i].descripcion << endl;
+        cout << "Estado: " << tareas[i].estado << endl;
+        cout << "Curso: " << tareas[i].curso << endl;
+        cout << "Codigo: " << tareas[i].codigoTarea << endl;
+        cout << "Año de entrega: " << tareas[i].anio << endl;
+        cout << "Mes de entrega: " << tareas[i].mes << endl;
+        cout << endl;
+    }
+
+    return contadorTarea;
 }
 
-void crearNTareas(Tarea tareas[100], int cantidadTareas){
-    int contadorTarea = 0;
+int crearNTareas(Estudiante &estudiante, Tarea tareas[100], Cursos materias[], int contadorTarea){
+    int i = 0;
     
     string repeticion = "s";
-    
+
+    system("CLS");
     while(repeticion == "s" && contadorTarea < 100) {
+        cout << "Tarea " << contadorTarea << endl;
+        cout << "--------------------\n";
+        cin.ignore();
+
         cout << "Ingresa el nombre de la tarea: ";
-        cin >> tareas[contadorTarea].nombre;
+        getline(cin, tareas[contadorTarea].nombre);
         
         cout << "Ingresa la descripción de la tarea: ";
-        cin >> tareas[contadorTarea].descripcion;
+        getline(cin, tareas[contadorTarea].descripcion);
+
+        cout << "Ingrese el codigo del curso al que pertenece la materia, las materias son: \n";
+        cout << endl;
+
+        cout << left << setw(20) << "Materia" << setw(10) << "Codigo" << endl;
+        for(i = 0; i < estudiante.numMateriasInscritas ; i++) {
+            cout << setw(20) << left << estudiante.materias[i].nombre << setw(10) << left << estudiante.materias[i].codigo << endl;
+        }
+
+        cout << endl;
+
+        cin >> tareas[contadorTarea].curso;
         
-        cout << "Ingresa el código de la tarea: ";
-        cin >> tareas[contadorTarea].codigoTarea;
         
-        //Solicitar fecha de entrega
-        tareas[contadorTarea].anio = obtnerAnio();
+        cout << "\nFecha de entrega de la tarea.\n";
+        cout << "--------------------\n";
+
+        //Fechas
+        tareas[contadorTarea].anio = obtenerAnio();
         tareas[contadorTarea].mes = obtenerMes(tareas[contadorTarea].anio);
         tareas[contadorTarea].dia = obtenerDia(tareas[contadorTarea].mes, tareas[contadorTarea].anio);
+        tareas[contadorTarea].codigoTarea = crearCodigo(estudiante, tareas[contadorTarea].curso, materias);    
+        
+        tareas[contadorTarea].estado = "En proceso";
+
+        contadorTarea++;
         
         cout << "¿Desea agregar otra tarea? s/n: ";
         cin >> repeticion;
+    }
+
+    for (i=0; i < contadorTarea; i++) {
+        cout << endl << "Nombre de la tarea "<< i+1 << ": " << tareas[i].nombre << endl;
+        cout << "Descripcion: " << tareas[i].descripcion << endl;
+        cout << "Estado: " << tareas[i].estado << endl;
+        cout << "Curso: " << tareas[i].curso << endl;
+        cout << "Codigo: " << tareas[i].codigoTarea << endl;
+        cout << "Año de entrega: " << tareas[i].anio << endl;
+        cout << "Mes de entrega: " << tareas[i].mes << endl;
+        cout << endl;
+    }
+
+    return contadorTarea;
+}
+
+void buscarFechaTarea(Tarea tareas[], int contadorTarea) {
+    string repeticion = "s";
+    int tareasCoinciden = 0,  diaTarea, mesTarea, anioTarea, i;
+    system("CLS");
+
+    while(repeticion == "s") {
+        tareasCoinciden = 0;
+        cout << "Ingrese el dia a buscar de la tarea: ";
+        cin >> diaTarea;
+        for (i = 0; i < contadorTarea; i++)
+        {
+            if ( tareas[i].dia == diaTarea) {
+                cout << "Ingrese el mes a buscar de la tarea: ";
+                cin >> mesTarea;
+                while (cin.fail() || mesTarea < 1 || mesTarea > 12){
+                    cin.clear();
+                    cin.ignore();
+                    cout << "Ingrese un mes válido. Intente nuevamente: ";
+                    cin >> mesTarea;
+                }
+                if ( tareas[i].mes == mesTarea) {
+                    cout << "Ingrese el anio a buscar de la tarea: ";
+                    cin >> anioTarea;
+                    while (cin.fail() || anioTarea <= 0 ){
+                        cin.clear();
+                        cin.ignore();
+                        cout << "Ingrese un anio válido. Intente nuevamente: ";
+                        cin >> anioTarea;
+                    }
+                    if (tareas[i].anio == anioTarea)
+                    {
+                        cout << endl << "Tareas que coinciden con la busqueda. \n";
+                        cout << endl << "Nombre de la tarea "<< i+1 << ": " << tareas[i].nombre << endl;
+                        cout << "Descripcion: " << tareas[i].descripcion << endl;
+                        cout << "Estado: " << tareas[i].estado << endl;
+                        cout << "Curso: " << tareas[i].curso << endl;
+                        cout << "Codigo: " << tareas[i].codigoTarea << endl;
+                        cout << "Año de entrega: " << tareas[i].anio << endl;
+                        cout << "Mes de entrega: " << tareas[i].mes << endl;
+                        cout << endl;
+                        tareasCoinciden++;
+                    }
+                    
+                }
+            }
+        }
+
+        if (tareasCoinciden == 0) {
+            cout << endl << "Ninguna tarea coincide con el criterio de búsqueda.\n";
+        }
+
+        cout << "¿Desea buscar otra tarea? s/n: ";
+        cin >> repeticion;
+        cout << endl;
+        
     }
 }
 
 
 //Funciones adicionales
 int obtenercodigo(){
-    int codigo;
+    float codigo;
     
     cout << "Ingrese el código de estudiante: ";
     cin >> codigo;
@@ -262,7 +401,24 @@ int obtenercodigo(){
         cin >> codigo;
     }
 
-    return codigo;
+    return float(codigo);
+}
+
+string obtenerCorreo (){
+	string correo;
+	int contador=0;
+    cin.ignore(); 
+	do{
+		if (contador==0){
+			cout<<"Ingrese correo: ";
+		    getline(cin, correo);
+		}else{
+			cout<<"El correo no es válido, vuelva a ingresar el correo: ";
+		    getline(cin, correo);
+		}
+		contador++;
+	}while (!validarcorreo(correo));
+	return correo;
 }
 
 bool validarcorreo(string correo){
@@ -289,7 +445,7 @@ bool validarcorreo(string correo){
 				}else{
 	                for (int j = i; j < cantletras; j++){	//El for empieza a contar desde la posicion del arroba hasta encontrar un punto
 	                    if (correo[j] == punto[0]){
-	                    		
+
 	                    	if (j-i<=1){	//El arroba y el punto no pueden ir seguidos
 	                    		break;
 							}else{
@@ -297,9 +453,9 @@ bool validarcorreo(string correo){
 									var=true;
 	                    			break;
 								}
-								
+
 							}
-	                        
+
 	                    }
 	                }
 	            }
@@ -309,42 +465,44 @@ bool validarcorreo(string correo){
 	}
 	return var;    
 }
-string obtenercorreo (){
-	string correo;
-	int contador=0;
-	do{
-		if (contador==0){
-			cout<<"\nIngrese correo: ";
-		}else{
-			cout<<"\nEl correo no es válido, vuelva a ingresar el correo: ";
-		}
-		cin>>correo;
-		contador++;
-	}while (!validarcorreo(correo));
-	return correo;
+string crearCodigo(Estudiante &estudiante, string cursoNombre, Cursos materias[]){
+    int i;
+    string codigo= cursoNombre + to_string(cursoNombre[0]);
+
+    //Incrementar la cantidad de tareas
+    for(i = 0; i < estudiante.numMateriasInscritas ; i++) {
+        if (materias[i].nombre == cursoNombre)
+        {
+            materias[i].cantidad++;
+        } 
+    }
+
+    return codigo;
 }
-int obtnerAnio(){
+
+int obtenerAnio(){
+
     int anio;
     string respuesta;
 
     //Preguntar si la fecha de entrega es este año
-    cout << "\n¿La tarea se entrega este año? s/n: ";
+    cout << "¿La tarea se entrega este año? s/n: ";
     cin >> respuesta;
     
     while(respuesta != "s" && respuesta != "n"){
-        cout << "\nDigite 's' o 'n', ningún otro valor: ";
+        cout << "Digite 's' o 'n', ningún otro valor: ";
         cin >> respuesta;
     }
 
     if (respuesta == "s"){
         anio = 2024;
     }else{
-        cout << "\nIngrese el año de entrega: ";
+        cout << "Ingrese el año de entrega: ";
         cin >> anio;
-        while (cin.fail() || anio < 2023){
+        while (cin.fail() || anio > 2023){
             cin.clear();
             cin.ignore();
-            cout << "\nIngrese una año que aún no haya pasado, intente nuevamente: ";
+            cout << "Ingrese una año que aún no haya pasado, intente nuevamente: ";
             cin >> anio;
         }
     }
@@ -354,7 +512,7 @@ int obtnerAnio(){
 
 int obtenerMes(int anio){
     int mes;
-    int mesMinimo= 1;
+    int mesMinimo= 0;
     string meses[12] = {"Enero", "Febrero", "Marzo", "Abril", "Mayo","Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"};
 
     cout << "\nSeleccione el mes de entrega: \n";
@@ -362,55 +520,51 @@ int obtenerMes(int anio){
         cout << i+1 << ". " << meses[i] << "\n";
     }
 
-    cout << "\nIngrese el número del mes: ";
     //Si el año es 2024, el mes debe ser mayor a 5
     if (anio == 2024){
         mesMinimo = 5;
-        cout << "(recuerda que el mes de entrega debe partir desde junio)";
-    }   
+        cout << "Recuerda que el mes de entrega debe partir desde junio";
+    }
+
+    cout << "Ingrese el número del mes: ";
     cin >> mes;
     
     while (cin.fail() || mes < mesMinimo || mes > 12){
         cin.clear();
         cin.ignore();
-        cout << "\nIngrese un mes válido, solo el  número. Intente nuevamente: ";
+        cout << "Ingrese un mes válido, solo el  número. Intente nuevamente: ";
     }
 
     return mes;
 }
 int obtenerDia(int mes, int anio){
-    int dia, maximoDia;
+    int dia, ultimoDiaDelMes;
 
-    //Establecer día en la que acaba el mes
-    switch (mes){
-        case 1:
-        case 3:
-        case 5:
-        case 7:
-        case 8:
-        case 10:
-        case 12:
-            maximoDia = 31;
+    //Obtener último día del mes
+    switch(mes){
+        case 1 && 3 && 4 && 5 && 7 && 8 && 10 && 12:
+            ultimoDiaDelMes = 31;
+
             break;
         case 2:
-            //Revisar si es bisiesto
-            if(anio % 4){
-                maximoDia = 29;
+            //Revisar si el año es bisiesto
+            if (anio % 4 == 0){
+                ultimoDiaDelMes = 29;
             }else{
-                maximoDia = 28;
+                ultimoDiaDelMes = 38;
             }
+
             break;
         default:
-            maximoDia = 30;//30 para los demás meses
+            ultimoDiaDelMes = 30;
     }
 
-    cout << "\nAhora ingrese el día de entrega de la tarea";
+    cout << "\nIngrese el día de entrega: ";
     cin >> dia;
-
-    while (cin.fail() || dia < 1 || dia > maximoDia){
+    while (cin.fail() || dia < 1 || dia < ultimoDiaDelMes){
         cin.clear();
         cin.ignore();
-        cout << "\nDebes ingresar un número entre 1 y " << maximoDia << ".Intenta nuevamente: ";
+        cout << "\nALgo salió mal, solo puedes ingresar números entre 1 y " << ultimoDiaDelMes << " , intenta otra vez: ";
         cin >> dia;
     }
 
