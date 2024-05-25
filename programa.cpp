@@ -9,6 +9,7 @@ Fecha: 5 de Junio
 #include <locale.h>
 #include <string>
 #include <iomanip>
+
 using namespace std;
 
 
@@ -64,10 +65,12 @@ int obtenercodigo();
 int obtenerAnio();
 int obtenerMes(int anio);
 int obtenerDia(int mes, int anio);
-
-string obtenerCorreo();
-string crearCodigo(Estudiante &estudiante, string cursoNombre, Cursos materias[]);
 bool validarcorreo(string correo);
+
+string crearCodigo(Estudiante &estudiante, string cursoNombre, Cursos materias[]);
+string obtenerCorreo();
+string obtenerNombre(string aPedir);
+bool validarNombre(string nombre);
 
 
 main() { 
@@ -155,11 +158,9 @@ void registrarEstudiante(Estudiante &estudiante) {
     cout << "--------------------\n";
     cout << "Datos personales.\n";
 
-    cout << "Ingresa tu nombre: ";
-    getline(cin, estudiante.nombre);
+    estudiante.nombre = obtenerNombre("nombre");
 
-    cout << "Ingresa tu apellido: ";
-    cin >> estudiante.apellido;
+    estudiante.apellido = obtenerNombre("apellido");
 
     estudiante.correo = obtenerCorreo();
   
@@ -326,6 +327,20 @@ int crearNTareas(Estudiante &estudiante, Tarea tareas[100], Cursos materias[], i
     }
 
     return contadorTarea;
+}
+
+string obtenerNombre(string aPedir){
+    string nombre;
+    cout << "\nIngrese su(s) "<< aPedir <<"(s): ";
+    cin >> nombre;
+    while (!validarNombre(nombre)){
+        cin.clear();
+        cin.ignore();
+        cout << "El " << aPedir << " no puede llevar números\nIntente otra vez: ";
+        cin >> nombre;
+    }
+
+    return nombre;
 }
 
 void buscarFechaTarea(Tarea tareas[], int contadorTarea) {
@@ -569,4 +584,17 @@ int obtenerDia(int mes, int anio){
     }
 
     return dia;
+}
+
+bool validarNombre(string nombre){
+    bool nombreValido = true;
+
+    for (int i = 0; i < nombre.length(); i++){
+        if (isdigit(nombre[i])){
+            nombreValido = false;
+            break;
+        }
+    }
+
+    return nombreValido;
 }
