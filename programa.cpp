@@ -174,6 +174,7 @@ void registrarEstudiante(Estudiante &estudiante) {
 void registrarMaterias(Estudiante &estudiante) { 
     string continuar;
     int numMateriasRegistradas = 0;
+    int contadorMat;
 
     cout << "\nMaterias.\n";
     cout << "--------------------";
@@ -185,10 +186,35 @@ void registrarMaterias(Estudiante &estudiante) {
         cin.ignore();
 
         cout << "\nIngresa el nombre de la materia: ";
-        getline(cin, estudiante.materias[numMateriasRegistradas].nombre);
+        do{
+            contadorMat=0;
+            getline(cin, estudiante.materias[numMateriasRegistradas].nombre);
+            if (numMateriasRegistradas==0){
+            }else{
+                for (int i=0;i<numMateriasRegistradas;i++){
+                    if ( estudiante.materias[i].nombre == estudiante.materias[numMateriasRegistradas].nombre){
+                        cout << "Dos materias no pueden llamarse igual, ingrese un nuevo nombre: ";
+                        contadorMat++;
+                    }               
+                }
+            }
+        }while (contadorMat!=0);
+        
 
         cout << "\tAhora registra el código de la materia: ";
-        cin >> estudiante.materias[numMateriasRegistradas].codigo;
+        do{
+            contadorMat=0;
+            getline(cin, estudiante.materias[numMateriasRegistradas].codigo);
+            if (numMateriasRegistradas==0){
+            }else{
+                for (int i=0;i<numMateriasRegistradas;i++){
+                    if ( estudiante.materias[i].codigo == estudiante.materias[numMateriasRegistradas].codigo){
+                        cout << "Dos materias no pueden tener el mismo código, ingrese uno nuevo: ";
+                        contadorMat++;
+                    }               
+                }
+            }
+        }while (contadorMat!=0);
 
         cout << "\nLa materia se registró como " << estudiante.materias[numMateriasRegistradas].nombre << endl;
         cout << "El código de " << estudiante.materias[numMateriasRegistradas].nombre << " es " << estudiante.materias[numMateriasRegistradas].codigo;
@@ -629,7 +655,6 @@ int indiceTarea(Tarea tareas[], int contadorTarea) {
 string obtenerCorreo (){
 	string correo;
 	int contador=0;
-    cin.ignore(); 
 	do{
 		if (contador==0){
 			cout<<"Ingrese correo: ";
@@ -745,7 +770,7 @@ int obtenerMes(int anio){
     //Si el año es 2024, el mes debe ser mayor a 5
     if (anio == 2024){
         mesMinimo = 5;
-        cout << "Recuerda que el mes de entrega debe partir desde junio";
+        cout << "Recuerda que el mes de entrega debe partir desde junio" <<endl ;
     }
 
     cout << "Ingrese el número del mes: ";
