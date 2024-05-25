@@ -336,171 +336,177 @@ void modificarTarea(Tarea tareas[], int contadorTarea) {
 
     int decision = 0, opcion, indice, opcionFecha;
 
-    indice = indiceTarea(tareas, contadorTarea) - 1;
+    if ( contadorTarea > 0 ) {
+            indice = indiceTarea(tareas, contadorTarea) - 1;
 
-    while(decision == 0) {
-        system("CLS");
+            while(decision == 0) {
+                system("CLS");
 
-        cout << "Opciones.\n";
-        cout << "--------------------\n";
-        cout << "1. Modificar nombre de una tarea.\n";
-        cout << "2. Modificar fecha de una tarea.\n";
-        cout << "3. Modificar descripcion de una tarea.\n";
-        cout << "4. Modificar todo.\n";
-        cout << "5. Cambiar tarea.\n";
-        cout << "6. Salir.\n";
+                cout << "Opciones.\n";
+                cout << "--------------------\n";
+                cout << "1. Modificar nombre de una tarea.\n";
+                cout << "2. Modificar fecha de una tarea.\n";
+                cout << "3. Modificar descripcion de una tarea.\n";
+                cout << "4. Modificar todo.\n";
+                cout << "5. Cambiar tarea.\n";
+                cout << "6. Salir.\n";
 
-        cin >> opcion;
+                cin >> opcion;
 
-        while (cin.fail())
-        {
-            cin.clear();
-            cin.ignore();
-            cout << "\nIngrese una opción válida. Intente nuevamente: ";
-            cin >> opcion;
-        }
+                while (cin.fail())
+                {
+                    cin.clear();
+                    cin.ignore();
+                    cout << "\nIngrese una opción válida. Intente nuevamente: ";
+                    cin >> opcion;
+                }
 
-        switch (opcion)
-        {
-        case 1:
-            system("CLS");
-            cout << "Ingrese el nuevo nombre de la tarea " << tareas[indice].nombre << ": ";
-            cin.ignore();
-            
-            getline(cin, tareas[indice].nombre);
-            break;
+                switch (opcion)
+                {
+                case 1:
+                    system("CLS");
+                    cout << "Ingrese el nuevo nombre de la tarea " << tareas[indice].nombre << ": ";
+                    cin.ignore();
+                    
+                    getline(cin, tareas[indice].nombre);
+                    break;
 
-        case 2:
-            system("CLS");
-            cout << "¿Qué desea cambiar?\n";
-            cout << "--------------------\n";
-            cout << "1. Modificar año.\n";
-            cout << "2. Modificar mes.\n";
-            cout << "3. Modificar día.\n";
-            cout << "4. Modificar 2 o más parámetros.\n";
-            cout << "5. Salir.\n";
+                case 2:
+                    system("CLS");
+                    cout << "¿Qué desea cambiar?\n";
+                    cout << "--------------------\n";
+                    cout << "1. Modificar año.\n";
+                    cout << "2. Modificar mes.\n";
+                    cout << "3. Modificar día.\n";
+                    cout << "4. Modificar 2 o más parámetros.\n";
+                    cout << "5. Salir.\n";
 
-            cin >> opcionFecha;
+                    cin >> opcionFecha;
 
-            while (cin.fail() || opcionFecha > 5 || opcionFecha < 1)
-            {
-                cin.clear();
-                cin.ignore();
-                cout << "\nIngrese una opción válida. Intente nuevamente: ";
-                cin >> opcionFecha;
+                    while (cin.fail() || opcionFecha > 5 || opcionFecha < 1)
+                    {
+                        cin.clear();
+                        cin.ignore();
+                        cout << "\nIngrese una opción válida. Intente nuevamente: ";
+                        cin >> opcionFecha;
+                    }
+
+                    switch (opcionFecha)
+                    {
+                    case 1:
+                        tareas[indice].anio = obtenerAnio();
+                        break;
+
+                    case 2:
+                        tareas[indice].mes = obtenerMes(tareas[indice].anio);
+                        break;
+
+                    case 3:
+                        tareas[indice].dia = obtenerDia(tareas[indice].mes, tareas[indice].anio);
+                        break;
+                    
+                    case 4:
+                        tareas[indice].anio = obtenerAnio();
+                        tareas[indice].mes = obtenerMes(tareas[indice].anio);
+                        tareas[indice].dia = obtenerDia(tareas[indice].mes, tareas[indice].anio);
+                        break;
+
+                    case 5:
+                        break;
+
+                    }
+                    break;
+
+                case 3:
+                    system("CLS");
+
+                    cout << "Ingrese la nueva descripción de la tarea " << tareas[indice].nombre << "." << endl;
+                    cout << "La descripción actual es " << tareas[indice].descripcion << "." << endl;
+
+                    cin.ignore();
+                    getline(cin, tareas[indice].descripcion);
+
+                    break;
+
+                case 4:
+                    system("CLS");
+
+                    cout << "Ingrese el nuevo nombre de la tarea " << tareas[indice].nombre << ": ";
+                    cin.ignore();
+                    
+                    getline(cin, tareas[indice].nombre);
+
+                    system("CLS");
+                    cout << "¿Qué desea cambiar de la fecha?\n";
+                    cout << "--------------------\n";
+                    cout << "1. Modificar año.\n";
+                    cout << "2. Modificar mes.\n";
+                    cout << "3. Modificar día.\n";
+                    cout << "4. Modificar 2 o más parámetros.\n";
+                    cout << "5. Salir.\n";
+
+                    cin >> opcionFecha;
+
+                    while (cin.fail() || opcionFecha > 5 || opcionFecha < 1)
+                    {
+                        cin.clear();
+                        cin.ignore();
+                        cout << "\nIngrese una opción válida. Intente nuevamente: ";
+                        cin >> opcionFecha;
+                    }
+
+                    switch (opcionFecha)
+                    {
+                    case 1:
+                        tareas[indice].anio = obtenerAnio();
+                        break;
+
+                    case 2:
+                        tareas[indice].mes = obtenerMes(tareas[indice].anio);
+                        break;
+
+                    case 3:
+                        tareas[indice].dia = obtenerDia(tareas[indice].mes, tareas[indice].anio);
+                        break;
+                    
+                    case 4:
+                        tareas[indice].anio = obtenerAnio();
+                        tareas[indice].mes = obtenerMes(tareas[indice].anio);
+                        tareas[indice].dia = obtenerDia(tareas[indice].mes, tareas[indice].anio);
+                        break;
+
+                    case 5:
+                        break;
+
+                    }
+
+                    system("CLS");
+
+                    cout << "Ingrese la nueva descripción de la tarea " << tareas[indice].nombre << "." << endl;
+                    cout << "La descripción actual es " << tareas[indice].descripcion << "." << endl;
+                    cin.ignore();
+                    
+                    getline(cin, tareas[indice].descripcion);
+                    break;
+
+                case 5:
+                    indiceTarea(tareas, contadorTarea);
+                    break;
+                
+                case 6:
+                    decision = 1;
+                    break;
+
+                default:
+                    cout << "Ingrese una opción válida.";
+                    break;
+                }
+
             }
-
-            switch (opcionFecha)
-            {
-            case 1:
-                tareas[indice].anio = obtenerAnio();
-                break;
-
-            case 2:
-                tareas[indice].mes = obtenerMes(tareas[indice].anio);
-                break;
-
-            case 3:
-                tareas[indice].dia = obtenerDia(tareas[indice].mes, tareas[indice].anio);
-                break;
-            
-            case 4:
-                tareas[indice].anio = obtenerAnio();
-                tareas[indice].mes = obtenerMes(tareas[indice].anio);
-                tareas[indice].dia = obtenerDia(tareas[indice].mes, tareas[indice].anio);
-                break;
-
-            case 5:
-                break;
-
-            }
-            break;
-
-        case 3:
-            system("CLS");
-
-            cout << "Ingrese la nueva descripción de la tarea " << tareas[indice].nombre << "." << endl;
-            cout << "La descripción actual es " << tareas[indice].descripcion << "." << endl;
-
-            cin.ignore();
-            getline(cin, tareas[indice].descripcion);
-
-            break;
-
-        case 4:
-            system("CLS");
-
-            cout << "Ingrese el nuevo nombre de la tarea " << tareas[indice].nombre << ": ";
-            cin.ignore();
-            
-            getline(cin, tareas[indice].nombre);
-
-            system("CLS");
-            cout << "¿Qué desea cambiar de la fecha?\n";
-            cout << "--------------------\n";
-            cout << "1. Modificar año.\n";
-            cout << "2. Modificar mes.\n";
-            cout << "3. Modificar día.\n";
-            cout << "4. Modificar 2 o más parámetros.\n";
-            cout << "5. Salir.\n";
-
-            cin >> opcionFecha;
-
-            while (cin.fail() || opcionFecha > 5 || opcionFecha < 1)
-            {
-                cin.clear();
-                cin.ignore();
-                cout << "\nIngrese una opción válida. Intente nuevamente: ";
-                cin >> opcionFecha;
-            }
-
-            switch (opcionFecha)
-            {
-            case 1:
-                tareas[indice].anio = obtenerAnio();
-                break;
-
-            case 2:
-                tareas[indice].mes = obtenerMes(tareas[indice].anio);
-                break;
-
-            case 3:
-                tareas[indice].dia = obtenerDia(tareas[indice].mes, tareas[indice].anio);
-                break;
-            
-            case 4:
-                tareas[indice].anio = obtenerAnio();
-                tareas[indice].mes = obtenerMes(tareas[indice].anio);
-                tareas[indice].dia = obtenerDia(tareas[indice].mes, tareas[indice].anio);
-                break;
-
-            case 5:
-                break;
-
-            }
-
-            system("CLS");
-
-            cout << "Ingrese la nueva descripción de la tarea " << tareas[indice].nombre << "." << endl;
-            cout << "La descripción actual es " << tareas[indice].descripcion << "." << endl;
-            cin.ignore();
-            
-            getline(cin, tareas[indice].descripcion);
-            break;
-
-        case 5:
-            indiceTarea(tareas, contadorTarea);
-            break;
-        
-        case 6:
-            decision = 1;
-            break;
-
-        default:
-            cout << "Ingrese una opción válida.";
-            break;
-        }
-
+    }
+    else {
+        cout << "Ingrese alguna tarea.\n";
+        system("PAUSE");
     }
 }
 
@@ -612,7 +618,7 @@ int indiceTarea(Tarea tareas[], int contadorTarea) {
     while (cin.fail() || tareaModificar < 1 || tareaModificar > contadorTarea)
     {
         cin.clear();
-        cin.ignore();
+        cin.ignore(200, '\n');
         cout << "\nIngrese una tarea válida. Intente nuevamente: ";
         cin >> tareaModificar;
     }
