@@ -9,6 +9,7 @@ Fecha: 5 de Junio
 #include <locale.h>
 #include <string>
 #include <iomanip>
+
 using namespace std;
 
 
@@ -49,7 +50,7 @@ void registrarMaterias(Estudiante &estudiante);
 
 // Funciones de las tareas
 int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea);
-int crearNTareas(Estudiante &estudiante, Tarea tareas[], int contadorTarea);
+int crearNTareas(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea);
 void modificarTarea(Tarea &tarea);
 void eliminarTarea(Tarea &tarea, int contadorTarea);
 void estadoTarea(Tarea &tarea);
@@ -64,10 +65,12 @@ int obtenercodigo();
 int obtenerAnio();
 int obtenerMes(int anio);
 int obtenerDia(int mes, int anio);
-
-string obtenerCorreo();
-string crearCodigo(Estudiante &estudiante, string cursoNombre, Cursos materias[]);
 bool validarcorreo(string correo);
+
+string crearCodigo(Estudiante &estudiante, string cursoNombre, Cursos materias[]);
+string obtenerCorreo();
+string obtenerNombre(string aPedir);
+bool validarNombre(string nombre);
 
 
 main() { 
@@ -117,7 +120,7 @@ main() {
                 break;
 
             case 2:
-                contadorTarea = crearNTareas(perfil, tareas,  contadorTarea);
+                contadorTarea = crearNTareas(perfil, tareas, materias, contadorTarea);
                 system("pause");
                 break;
 
@@ -155,11 +158,9 @@ void registrarEstudiante(Estudiante &estudiante) {
     cout << "--------------------\n";
     cout << "Datos personales.\n";
 
-    cout << "Ingresa tu nombre: ";
-    getline(cin, estudiante.nombre);
+    estudiante.nombre = obtenerNombre("nombre");
 
-    cout << "Ingresa tu apellido: ";
-    cin >> estudiante.apellido;
+    estudiante.apellido = obtenerNombre("apellido");
 
     estudiante.correo = obtenerCorreo();
   
@@ -245,12 +246,9 @@ int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int co
     //Fechas
     tareas[contadorTarea].anio = obtenerAnio();
     tareas[contadorTarea].mes = obtenerMes(tareas[contadorTarea].anio);
+    tareas[contadorTarea].dia = obtenerDia(tareas[contadorTarea].mes, tareas[contadorTarea].anio);
     tareas[contadorTarea].codigoTarea = crearCodigo(estudiante, tareas[contadorTarea].curso, materias);    
 
-    // tareas[contadorTarea].dia = obtenerDia(tareas[contadorTarea].anio, tareas[contadorTarea].mes);
-
-    cout << endl << "Ingrese el día: ";
-    cin >> tareas[contadorTarea].dia; //Temporal
     
     tareas[contadorTarea].estado = "En proceso";
 
@@ -270,7 +268,7 @@ int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int co
     return contadorTarea;
 }
 
-int crearNTareas(Estudiante &estudiante, Tarea tareas[100], int contadorTarea){
+int crearNTareas(Estudiante &estudiante, Tarea tareas[100], Cursos materias[], int contadorTarea){
     int i = 0;
     
     string repeticion = "s";
@@ -306,12 +304,8 @@ int crearNTareas(Estudiante &estudiante, Tarea tareas[100], int contadorTarea){
         //Fechas
         tareas[contadorTarea].anio = obtenerAnio();
         tareas[contadorTarea].mes = obtenerMes(tareas[contadorTarea].anio);
-        // tareas[contadorTarea].codigoTarea = crearCodigo(estudiante, tareas[contadorTarea].curso, materias);    
-
-        // tareas[contadorTarea].dia = obtenerDia(tareas[contadorTarea].anio, tareas[contadorTarea].mes);
-
-        cout << endl << "Ingrese el día: ";
-        cin >> tareas[contadorTarea].dia; //Temporal
+        tareas[contadorTarea].dia = obtenerDia(tareas[contadorTarea].mes, tareas[contadorTarea].anio);
+        tareas[contadorTarea].codigoTarea = crearCodigo(estudiante, tareas[contadorTarea].curso, materias);    
         
         tareas[contadorTarea].estado = "En proceso";
 
@@ -333,6 +327,20 @@ int crearNTareas(Estudiante &estudiante, Tarea tareas[100], int contadorTarea){
     }
 
     return contadorTarea;
+}
+
+string obtenerNombre(string aPedir){
+    string nombre;
+    cout << "\nIngrese su(s) "<< aPedir <<"(s): ";
+    cin >> nombre;
+    while (!validarNombre(nombre)){
+        cin.clear();
+        cin.ignore();
+        cout << "El " << aPedir << " no puede llevar números\nIntente otra vez: ";
+        cin >> nombre;
+    }
+
+    return nombre;
 }
 
 void buscarFechaTarea(Tarea tareas[], int contadorTarea) {
@@ -396,7 +404,7 @@ void buscarFechaTarea(Tarea tareas[], int contadorTarea) {
 
 //Funciones adicionales
 int obtenercodigo(){
-    int codigo;
+    float codigo;
     
     cout << "Ingrese el código de estudiante: ";
     cin >> codigo;
@@ -408,7 +416,7 @@ int obtenercodigo(){
         cin >> codigo;
     }
 
-    return codigo;
+    return float(codigo);
 }
 
 string obtenerCorreo (){
@@ -544,6 +552,49 @@ int obtenerMes(int anio){
 
     return mes;
 }
-// int obtenerDia(int mes, int anio){
-//     int dia;
-// }
+int obtenerDia(int mes, int anio){
+    int dia, ultimoDiaDelMes;
+
+    //Obtener último día del mes
+    switch(mes){
+        case 1 && 3 && 4 && 5 && 7 && 8 && 10 && 12:
+            ultimoDiaDelMes = 31;
+
+            break;
+        case 2:
+            //Revisar si el año es bisiesto
+            if (anio % 4 == 0){
+                ultimoDiaDelMes = 29;
+            }else{
+                ultimoDiaDelMes = 38;
+            }
+
+            break;
+        default:
+            ultimoDiaDelMes = 30;
+    }
+
+    cout << "\nIngrese el día de entrega: ";
+    cin >> dia;
+    while (cin.fail() || dia < 1 || dia < ultimoDiaDelMes){
+        cin.clear();
+        cin.ignore();
+        cout << "\nALgo salió mal, solo puedes ingresar números entre 1 y " << ultimoDiaDelMes << " , intenta otra vez: ";
+        cin >> dia;
+    }
+
+    return dia;
+}
+
+bool validarNombre(string nombre){
+    bool nombreValido = true;
+
+    for (int i = 0; i < nombre.length(); i++){
+        if (isdigit(nombre[i])){
+            nombreValido = false;
+            break;
+        }
+    }
+
+    return nombreValido;
+}
