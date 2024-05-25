@@ -49,7 +49,7 @@ void registrarMaterias(Estudiante &estudiante);
 
 // Funciones de las tareas
 int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea);
-int crearNTareas(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea);
+int crearNTareas(Estudiante &estudiante, Tarea tareas[], int contadorTarea);
 void modificarTarea(Tarea &tarea);
 void eliminarTarea(Tarea &tarea, int contadorTarea);
 void estadoTarea(Tarea &tarea);
@@ -117,7 +117,7 @@ main() {
                 break;
 
             case 2:
-                contadorTarea = crearNTareas(perfil, tareas, materias, contadorTarea);
+                contadorTarea = crearNTareas(perfil, tareas,  contadorTarea);
                 system("pause");
                 break;
 
@@ -270,7 +270,7 @@ int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int co
     return contadorTarea;
 }
 
-int crearNTareas(Estudiante &estudiante, Tarea tareas[100], Cursos materias[], int contadorTarea){
+int crearNTareas(Estudiante &estudiante, Tarea tareas[100], int contadorTarea){
     int i = 0;
     
     string repeticion = "s";
@@ -306,7 +306,7 @@ int crearNTareas(Estudiante &estudiante, Tarea tareas[100], Cursos materias[], i
         //Fechas
         tareas[contadorTarea].anio = obtenerAnio();
         tareas[contadorTarea].mes = obtenerMes(tareas[contadorTarea].anio);
-        tareas[contadorTarea].codigoTarea = crearCodigo(estudiante, tareas[contadorTarea].curso, materias);    
+        // tareas[contadorTarea].codigoTarea = crearCodigo(estudiante, tareas[contadorTarea].curso, materias);    
 
         // tareas[contadorTarea].dia = obtenerDia(tareas[contadorTarea].anio, tareas[contadorTarea].mes);
 
