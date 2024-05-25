@@ -246,7 +246,7 @@ int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int co
     int i;
 
     cin.ignore();
-    cout << "Tarea " << contadorTarea << endl;
+    cout << "Tarea " << contadorTarea + 1<< endl;
     cout << "--------------------\n";
 
     cout << "Ingresa el nombre de la tarea: ";
@@ -255,17 +255,32 @@ int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int co
     cout << "Ingresa la descripción de la tarea: ";
     getline(cin, tareas[contadorTarea].descripcion);
 
-    cout << "Ingrese el codigo del curso al que pertenece la materia, las materias son: \n";
+    cout << "Ingrese el código del curso al que pertenece la materia, las materias son: \n";
     cout << endl;
 
     cout << left << setw(20) << "Materia" << setw(10) << "Codigo" << endl;
-    for(i = 0; i < estudiante.numMateriasInscritas ; i++) {
+    for(i = 0; i < estudiante.numMateriasInscritas ; i++) {//impresion de nombre y codigo de materia
         cout << setw(20) << left << estudiante.materias[i].nombre << setw(10) << left << estudiante.materias[i].codigo << endl;
     }
 
-    cout << endl;
+    cout << endl << "Ingrese código: ";
 
-    cin >> tareas[contadorTarea].curso;
+    int cantmaterias=i;
+
+    do{ //Validación del ingreso del codigo del curso en la tarea
+        int numTarea=0;
+        getline(cin, tareas[contadorTarea].curso);
+        for (int i=0;i<cantmaterias;i++){
+            if ( tareas[contadorTarea].curso==estudiante.materias[i].codigo){
+                numTarea++;
+                break;
+            }
+        }
+        if (numTarea!=0){
+            break;
+        }
+        cout << "El código que ingreso no pertenece a ninguna materia, ingrese de nuevo el código: ";
+    }while (true);
     
     
     cout << "\nFecha de entrega de la tarea.\n";
@@ -303,7 +318,7 @@ int crearNTareas(Estudiante &estudiante, Tarea tareas[100], Cursos materias[], i
 
     system("CLS");
     while(repeticion == "s" && contadorTarea < 100) {
-        cout << "Tarea " << contadorTarea << endl;
+        cout << "Tarea " << contadorTarea+1 << endl;
         cout << "--------------------\n";
         cin.ignore();
 
@@ -321,9 +336,25 @@ int crearNTareas(Estudiante &estudiante, Tarea tareas[100], Cursos materias[], i
             cout << setw(20) << left << estudiante.materias[i].nombre << setw(10) << left << estudiante.materias[i].codigo << endl;
         }
 
-        cout << endl;
+        cout << endl << "Ingrese código: ";
 
-        cin >> tareas[contadorTarea].curso;
+        int cantmaterias=i;
+
+        do{ //Validación del ingreso del codigo del curso en la tarea
+            int numTarea=0;
+            getline(cin, tareas[contadorTarea].curso);
+            for (int i=0;i<cantmaterias;i++){
+                if ( tareas[contadorTarea].curso==estudiante.materias[i].codigo){
+                    numTarea++;
+                    break;
+                }
+            }
+            if (numTarea!=0){
+                break;
+            }
+            cout << "El código que ingreso no pertenece a ninguna materia, ingrese de nuevo el código: ";
+        }while (true);
+    
         
         
         cout << "\nFecha de entrega de la tarea.\n";
