@@ -9,6 +9,7 @@ Fecha: 5 de Junio
 #include <locale.h>
 #include <string>
 #include <iomanip>
+#include <cctype>
 
 using namespace std;
 
@@ -41,6 +42,7 @@ struct Tarea {
     int dia;
     int mes;
     int anio;
+    float nota;
     Cursos materia;
 };
 
@@ -52,6 +54,7 @@ void registrarMaterias(Estudiante &estudiante);
 int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea);
 int crearNTareas(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea);
 void modificarTarea(Tarea tareas[], int contadorTarea);
+void cambiarEstadoTarea(Tarea tareas[], int contadorTarea);
 void eliminarTarea(Tarea &tarea, int contadorTarea);
 void estadoTarea(Tarea &tarea);
 void buscarFechaTarea(Tarea tareas[], int contadorTarea);
@@ -64,6 +67,7 @@ void tareasFecha(Tarea &tarea);
 int obtenercodigo();
 int obtenerAnio();
 int indiceTarea(Tarea tareas[], int contadorTarea);
+int indiceTareaEstado(Tarea tareas[], int contadorTarea);
 int obtenerMes(int anio);
 int obtenerDia(int mes, int anio);
 bool validarcorreo(string correo);
@@ -130,6 +134,7 @@ main() {
                 break;
 
             case 4:
+                cambiarEstadoTarea(tareas, contadorTarea);
                 break;
 
             case 5:
@@ -243,6 +248,7 @@ void registrarMaterias(Estudiante &estudiante) {
 
 
 int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea){
+    system("CLS");
     int i;
 
     cin.ignore();
@@ -316,8 +322,8 @@ int crearNTareas(Estudiante &estudiante, Tarea tareas[100], Cursos materias[], i
     
     string repeticion = "s";
 
-    system("CLS");
     while(repeticion == "s" && contadorTarea < 100) {
+        system("CLS");
         cout << "Tarea " << contadorTarea+1 << endl;
         cout << "--------------------\n";
         cin.ignore();
@@ -394,6 +400,8 @@ void modificarTarea(Tarea tareas[], int contadorTarea) {
     int decision = 0, opcion, indice, opcionFecha;
 
     if ( contadorTarea > 0 ) {
+            cout << "Modificar tarea.\n";
+            cout << "--------------------\n";
             indice = indiceTarea(tareas, contadorTarea) - 1;
 
             while(decision == 0) {
@@ -547,6 +555,8 @@ void modificarTarea(Tarea tareas[], int contadorTarea) {
                     break;
 
                 case 5:
+                    cout << "Modificar tarea.\n";
+                    cout << "--------------------\n";
                     indiceTarea(tareas, contadorTarea);
                     break;
                 
@@ -562,26 +572,10 @@ void modificarTarea(Tarea tareas[], int contadorTarea) {
             }
     }
     else {
-        cout << "Ingrese alguna tarea.\n";
+        cout << "Primero debe ingresar alguna tarea.\n";
         system("PAUSE");
     }
 }
-
-string obtenerNombre(string aPedir){
-    string nombre;
-    cout << "Ingrese su(s) "<< aPedir <<"(s): ";
-    getline(cin, nombre);
-    while (!validarNombre(nombre)){
-        cin.clear();
-        cin.ignore();
-        cout << "El " << aPedir << " no puede llevar números\nIntente otra vez: ";
-        getline(cin, nombre);
-    }
-
-    return nombre;
-}
-
-
 
 void buscarFechaTarea(Tarea tareas[], int contadorTarea) {
     string repeticion = "s";
@@ -641,8 +635,137 @@ void buscarFechaTarea(Tarea tareas[], int contadorTarea) {
     }
 }
 
+void cambiarEstadoTarea(Tarea tareas[], int contadorTarea) {
+    int i, opcion, indice, decision = 0, caracteres;
+    float nota;
+    string estado, lower;
+
+    system("CLS");
+
+    if (contadorTarea > 0) {
+        
+        cout << "Modificar el estado de una tarea.\n";
+        cout << "--------------------\n";
+
+        indice = indiceTareaEstado(tareas, contadorTarea) - 1;
+
+        if (indice < 0) {
+            decision = 1;
+        }
+        
+
+        while (decision == 0)
+        {
+            system("CLS");
+
+            cout << "Opciones.\n";
+            cout << "--------------------\n";
+
+            cout << "\n1. Cambiar el estado.\n";
+            cout << "2. Cambiar de tarea.\n";
+            cout << "3. Salir.\n";
+
+            cin >> opcion;
+            while (cin.fail() || opcion < 0  || opcion > 3)
+            {
+                cin.clear();
+                cin.ignore();
+                cout << "\nIngrese una opcion correcta: ";
+                cin >> opcion;
+            }
+            
+
+            switch (opcion)
+            {
+            case 1:
+                system("CLS");
+                cout << "¿Ha entregado la tarea " << "'" << tareas[indice].nombre << "'" << "?: ";
+                cin >> estado;
+                
+                
+                caracteres = estado.length();
+
+                for (i = 0; i < caracteres; i++) {
+                    estado[i] = tolower(estado[i]);
+                }
+
+                while (estado != "entregada" && estado != "no entregada" && estado != "si" && estado != "no")
+                {
+                    cin.clear();
+                    cin.ignore();
+                    cout << "\nIngrese si/no, entregada/no entregada: ";
+                    cin >> estado;
+                }
+
+                if (estado == "entregada" || estado == "si")
+                {
+                    tareas[indice].estado = "Entregada";
+                    cout << "La tarea ha sido entregada, ahora ingrese la nota ( 0 a 5 ): ";
+                    cin >> nota;
+
+                    while (cin.fail() || nota < 0  || nota > 5)
+                    {
+                        cin.clear();
+                        cin.ignore();
+                        cout << "\nIngrese una nota correcta: ";
+                        cin >> nota;
+                    }
+
+                    cout << "\nLa nota de " << tareas[indice].nombre << " es " << nota << "." << endl;
+
+                    tareas[indice].nota = nota;
+                }
+
+                else {
+                    tareas[indice].estado = "No Entregada";
+                    cout << "La tarea " << tareas[indice].nombre << " no ha sido entregada. La nota es 0.\n";
+                    tareas[indice].nota = 0;
+                }
+
+                decision = 1;
+                
+                system("PAUSE");
+                break;
+            
+            case 2:
+                indice = indiceTareaEstado(tareas, contadorTarea) - 1;
+                break;
+            
+            case 3:
+                decision = 1;
+                break;
+            
+            default:
+                break;
+            }
+
+        }
+    }
+    else {
+        cout << "Primero debe ingresar alguna tarea.\n";
+        system("PAUSE");
+    }
+    
+}
+
 
 //Funciones adicionales
+
+string obtenerNombre(string aPedir){
+    string nombre;
+    cout << "Ingrese su(s) "<< aPedir <<"(s): ";
+    getline(cin, nombre);
+    while (!validarNombre(nombre)){
+        cin.clear();
+        cin.ignore();
+        cout << "El " << aPedir << " no puede llevar números\nIntente otra vez: ";
+        getline(cin, nombre);
+    }
+
+    return nombre;
+}
+
+
 int obtenercodigo(){
     float codigo;
     
@@ -661,10 +784,8 @@ int obtenercodigo(){
 
 int indiceTarea(Tarea tareas[], int contadorTarea) {
     int i, opcion, tareaModificar, indiceTarea;
-    cout << "Modificar tarea.\n";
-    cout << "--------------------\n";
 
-    cout << "\nEscoja la tarea a modificar.\n";
+    cout << "\nEscoja la tarea donde se realizarán los cambios.\n";
 
     for (i=0; i < contadorTarea; i++) {
         cout << endl << i+1 << ". " << tareas[i].nombre << endl;
@@ -681,6 +802,61 @@ int indiceTarea(Tarea tareas[], int contadorTarea) {
     }
 
     return tareaModificar;
+}
+
+int indiceTareaEstado(Tarea tareas[], int contadorTarea) {
+    int i, opcion, tareaModificar, indiceTarea, tareasSinModificar = 0;
+    do
+    {
+        cout << "\nEscoja la tarea donde se realizarán los cambios.\n";
+
+        for (i=0; i < contadorTarea; i++) {
+            cout << endl << i+1 << ". " << tareas[i].nombre << endl;
+        }
+
+        cout << endl;
+        cin >> tareaModificar;
+        while (cin.fail() || tareaModificar < 1 || tareaModificar > contadorTarea)
+        {
+            cin.clear();
+            cin.ignore(200, '\n');
+            cout << "\nIngrese una tarea válida. Intente nuevamente: ";
+            cin >> tareaModificar;
+        }
+
+        if (tareas[tareaModificar-1].estado != "En proceso")
+            {
+                system("CLS");
+                if (tareas[tareaModificar-1].estado == "Entregada")
+                {
+                    cout << "La tarea ya ha sido entregada." << "\nLa nota es " << tareas[tareaModificar-1].nota << ".\n";
+                }
+                else {
+                    cout << "La tarea no fue entregada." << "\nLa nota es " << tareas[tareaModificar-1].nota << ".\n";
+                }
+
+                for (i = 0; i < contadorTarea; i++)
+                {
+                    if (tareas[i].estado == "En proceso")
+                    {
+                        tareasSinModificar++;
+                    }
+                    
+                }
+                
+
+                if ( tareasSinModificar == 0) {
+                    cout << "Agregue otra tarea para realizar cambios en el estado.\n";
+                    system("PAUSE");
+                    tareaModificar = 0;
+                    break;
+                }
+
+            }
+    } while (tareas[tareaModificar-1].estado != "En proceso");
+
+    return tareaModificar;
+        
 }
 
 string obtenerCorreo (){
@@ -794,6 +970,7 @@ int obtenerMes(int anio){
     string meses[12] = {"Enero", "Febrero", "Marzo", "Abril", "Mayo","Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"};
 
     cout << "\nSeleccione el mes de entrega: \n";
+    cout << endl;
     for (int i = 0; i< 12; i++){
         cout << i+1 << ". " << meses[i] << "\n";
     }
@@ -801,20 +978,19 @@ int obtenerMes(int anio){
     //Si el año es 2024, el mes debe ser mayor a 5
     if (anio == 2024){
         mesMinimo = 6;
-        cout << "Recuerda que el mes de entrega debe partir desde junio" <<endl ;
+        cout << "\nRecuerda que el mes de entrega debe partir desde junio" <<endl ;
     }
 
     cout << "Ingrese el número del mes: ";
+    cin>>mes;
     int x=0;
-    do{
-        do{
-            cin>>mes;
-            cin.clear();
-            cin.ignore();
-            cout << "Ingrese un mes válido, solo el  número. Intente nuevamente: ";
-            break;
-        }while (cin.fail());
-    }while( mes < mesMinimo || mes > 12);
+
+    while (cin.fail() || mes < mesMinimo || mes > 12){
+        cin.clear();
+        cin.ignore(200, '\n');
+        cout << "Ingrese un mes válido. Intente nuevamente: ";
+        cin>>mes;
+    }
 
     return mes;
 }
