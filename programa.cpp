@@ -794,24 +794,27 @@ int obtenerMes(int anio){
     string meses[12] = {"Enero", "Febrero", "Marzo", "Abril", "Mayo","Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"};
 
     cout << "\nSeleccione el mes de entrega: \n";
-    for (int i= 0; i< 12; i++){
+    for (int i = 0; i< 12; i++){
         cout << i+1 << ". " << meses[i] << "\n";
     }
 
     //Si el año es 2024, el mes debe ser mayor a 5
     if (anio == 2024){
-        mesMinimo = 5;
+        mesMinimo = 6;
         cout << "Recuerda que el mes de entrega debe partir desde junio" <<endl ;
     }
 
     cout << "Ingrese el número del mes: ";
-    cin >> mes;
-    
-    while (cin.fail() || mes < mesMinimo || mes > 12){
-        cin.clear();
-        cin.ignore();
-        cout << "Ingrese un mes válido, solo el  número. Intente nuevamente: ";
-    }
+    int x=0;
+    do{
+        do{
+            cin>>mes;
+            cin.clear();
+            cin.ignore();
+            cout << "Ingrese un mes válido, solo el  número. Intente nuevamente: ";
+            break;
+        }while (cin.fail());
+    }while( mes < mesMinimo || mes > 12);
 
     return mes;
 }
