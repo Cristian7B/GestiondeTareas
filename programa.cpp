@@ -72,7 +72,7 @@ int obtenerMes(int anio);
 int obtenerDia(int mes, int anio);
 bool validarcorreo(string correo);
 
-string crearCodigo(Estudiante &estudiante, string cursoNombre, Cursos materias[]);
+string crearCodigo(Estudiante &estudiante, string cursoNombre);
 string obtenerCorreo();
 string obtenerNombre(string aPedir);
 bool validarNombre(string nombre);
@@ -287,6 +287,7 @@ int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int co
         }
         cout << "El código que ingreso no pertenece a ninguna materia, ingrese de nuevo el código: ";
     }while (true);
+
     
     
     cout << "\nFecha de entrega de la tarea.\n";
@@ -296,7 +297,7 @@ int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int co
     tareas[contadorTarea].anio = obtenerAnio();
     tareas[contadorTarea].mes = obtenerMes(tareas[contadorTarea].anio);
     tareas[contadorTarea].dia = obtenerDia(tareas[contadorTarea].mes, tareas[contadorTarea].anio);
-    tareas[contadorTarea].codigoTarea = crearCodigo(estudiante, tareas[contadorTarea].curso, materias);    
+    tareas[contadorTarea].codigoTarea = crearCodigo(estudiante, tareas[contadorTarea].curso);    
 
     
     tareas[contadorTarea].estado = "En proceso";
@@ -360,6 +361,8 @@ int crearNTareas(Estudiante &estudiante, Tarea tareas[100], Cursos materias[], i
             }
             cout << "El código que ingreso no pertenece a ninguna materia, ingrese de nuevo el código: ";
         }while (true);
+
+
     
         
         
@@ -370,7 +373,7 @@ int crearNTareas(Estudiante &estudiante, Tarea tareas[100], Cursos materias[], i
         tareas[contadorTarea].anio = obtenerAnio();
         tareas[contadorTarea].mes = obtenerMes(tareas[contadorTarea].anio);
         tareas[contadorTarea].dia = obtenerDia(tareas[contadorTarea].mes, tareas[contadorTarea].anio);
-        tareas[contadorTarea].codigoTarea = crearCodigo(estudiante, tareas[contadorTarea].curso, materias);    
+        tareas[contadorTarea].codigoTarea = crearCodigo(estudiante, tareas[contadorTarea].curso);    
         
         tareas[contadorTarea].estado = "En proceso";
 
@@ -919,20 +922,38 @@ bool validarcorreo(string correo){
 	}
 	return var;    
 }
-string crearCodigo(Estudiante &estudiante, string cursoNombre, Cursos materias[]){
-    int i;
-    string codigo= cursoNombre + to_string(cursoNombre[0]);
 
-    //Incrementar la cantidad de tareas
-    for(i = 0; i < estudiante.numMateriasInscritas ; i++) {
-        if (materias[i].nombre == cursoNombre)
-        {
-            materias[i].cantidad++;
-        } 
-    }
+string crearCodigo(Estudiante &estudiante, string codigoMateria){
+    string codigo;
+    bool codigoValido = false;
+    Cursos materia;
+
+    //Validar un código valido
+    do{
+        for(int i = 0; i < estudiante.numMateriasInscritas; i++){
+            if (estudiante.materias[i].codigo == codigoMateria){
+                codigoValido = true;
+                materia = estudiante.materias[i];
+                codigo = materia.codigo + to_string(materia.cantidad);
+
+                //Incrementar la cantidad de tareas de esa materia
+                estudiante.materias[i].cantidad++;
+                break;
+            }
+        }
+        if (!codigoValido){
+            cout << "Ingrese un código valido, intente nuevamente: ";
+            cin >> codigoMateria;
+        }
+    } while (!codigoValido);
+
+
+    materia.cantidad ++;
+    
 
     return codigo;
 }
+
 
 int obtenerAnio(){
 
