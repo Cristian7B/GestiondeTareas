@@ -65,7 +65,7 @@ void buscarFechaTarea(Tarea tareas[], int contadorTarea);
 // Consultas
 void tareasMateria(Tarea &tarea);
 void tareasFecha(Tarea &tarea);
-void historialTareas();
+void historialTareas(Tarea tarea[],Tarea TareaEliminada[],int contadorTarea,int contadorEliminado);
 
 // Funciones adicionales
 int obtenercodigo();
@@ -144,6 +144,7 @@ main() {
                 eliminarTarea( tareas, tareaEliminada,  contadorTarea,  contadorEliminado);
                 break;
             case 6:
+                historialTareas( tareas, tareaEliminada, contadorTarea, contadorEliminado);
                 break;
 
             case 7:
@@ -1123,4 +1124,19 @@ void eliminarTarea(Tarea tarea[],Tarea TareaEliminada[], int contadorTarea, int 
     }
 
 
+}
+
+void historialTareas(Tarea tarea[],Tarea TareaEliminada[],int contadorTarea,int contadorEliminado){
+    system("CLS");
+    cout<< "El historial de tareas actuales es: ";
+    for (int i=0;i<contadorTarea;i++){
+        cout<<"Tarea "<<i+1<<": "<< tarea[i].nombre<<endl;
+        cout<<"Fecha de entrega: "<<tarea[i].dia<<". "<<tarea[i].mes<<". "<<tarea[i].anio<<endl<<endl;
+    }
+    cout<< "El historial de tareas eliminadas es: ";
+    for (int i=0;i<contadorEliminado;i++){
+        cout<<"Tarea "<<i+1<<": "<< TareaEliminada[i].nombre<<endl;
+        cout<<"Fecha de entrega: "<<TareaEliminada[i].dia<<". "<<TareaEliminada[i].mes<<". "<<TareaEliminada[i].anio<<endl<<endl;
+    }
+    system("PAUSE");
 }
