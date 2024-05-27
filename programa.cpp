@@ -955,7 +955,7 @@ int obtenerDia(int mes, int anio){
 
     //Obtener último día del mes
     switch(mes){
-        case 1 && 3 && 5 && 7 && 8 && 10 && 12:
+        case 1 || 3 || 5 || 7 || 8 || 10 || 12:
             ultimoDiaDelMes = 31;
 
             break;
@@ -977,7 +977,7 @@ int obtenerDia(int mes, int anio){
     while (cin.fail() || dia < 1 || dia > ultimoDiaDelMes){
         cin.clear();
         cin.ignore();
-        cout << "\nAgo salió mal, solo puedes ingresar números entre 1 y " << ultimoDiaDelMes << " , intenta otra vez: ";
+        cout << "\nAlgo salió mal, solo puedes ingresar números entre 1 y " << ultimoDiaDelMes << " , intenta otra vez: ";
         cin >> dia;
     }
 
