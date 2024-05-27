@@ -13,6 +13,7 @@ Fecha: 5 de Junio
 
 using namespace std;
 
+//REGISTROS 
 
 //Nombre de los cursos del estudiante
 struct Cursos {
@@ -46,6 +47,8 @@ struct Tarea {
     Cursos materia;
 };
 
+//FUNCIONES
+
 // Prototipado de funciones
 void registrarEstudiante(Estudiante &estudiante);
 void registrarMaterias(Estudiante &estudiante); 
@@ -53,15 +56,16 @@ void registrarMaterias(Estudiante &estudiante);
 // Funciones de las tareas
 int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea);
 int crearNTareas(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea);
+void eliminarTarea(Tarea tarea[],Tarea TareaEliminada[], int contadorTarea, int contadorEliminado);
 void modificarTarea(Tarea tareas[], int contadorTarea);
 void cambiarEstadoTarea(Tarea tareas[], int contadorTarea);
-void eliminarTarea(Tarea &tarea, int contadorTarea);
 void estadoTarea(Tarea &tarea);
 void buscarFechaTarea(Tarea tareas[], int contadorTarea);
 
 // Consultas
 void tareasMateria(Tarea &tarea);
 void tareasFecha(Tarea &tarea);
+void historialTareas();
 
 // Funciones adicionales
 int obtenercodigo();
@@ -71,16 +75,15 @@ int indiceTareaEstado(Tarea tareas[], int contadorTarea);
 int obtenerMes(int anio);
 int obtenerDia(int mes, int anio);
 bool validarcorreo(string correo);
-
+bool validarNombre(string nombre);
 string crearCodigo(Estudiante &estudiante, string cursoNombre);
 string obtenerCorreo();
 string obtenerNombre(string aPedir);
-bool validarNombre(string nombre);
 
 
 main() { 
     //Vectorizacion de los struct
-    Tarea tareas[100];
+    Tarea tareas[100], tareaEliminada[100];
     Cursos materias[15];
     Estudiante perfil;
 
@@ -88,7 +91,7 @@ main() {
     system("cls");
     
     //Variales globales
-    int decision = 0, contadorMateria = 0, opcion = 0, contadorTarea = 0;
+    int decision = 0, contadorMateria = 0, opcion = 0, contadorTarea = 0, contadorEliminado=0;
 
     cout << "¡Bienvenido a tu sistema de gestion de tareas personal!\n";
 
@@ -138,8 +141,8 @@ main() {
                 break;
 
             case 5:
+                eliminarTarea( tareas, tareaEliminada,  contadorTarea,  contadorEliminado);
                 break;
-
             case 6:
                 break;
 
@@ -1060,4 +1063,64 @@ bool validarNombre(string nombre){
     }
 
     return nombreValido;
+}
+
+void eliminarTarea(Tarea tarea[],Tarea TareaEliminada[], int contadorTarea, int contadorEliminado){
+    int numTarea;
+    contadorEliminado=0;
+    system("CLS");
+    if (contadorTarea==0){
+        cout << "No tiene ninguna tarea actualmente\n ";
+        system("PAUSE");
+    }else{
+        cout<<"Las tareas creadas anteriormente son: "<< endl << endl;
+        for (int i=0; i<contadorTarea;i++){
+            if (tarea[i].nombre!=""){
+                cout << "       Tarea " << i+1 <<": " << tarea[i].nombre<<endl;   
+            }
+        }
+        cout<<"\nIngrese el número de la tarea que deséa eliminar: ";
+        do{
+            cin >> numTarea;
+            if (cin.fail()){
+                cin.clear();
+                cin.ignore(200, '\n');
+            }else{}
+            if ( numTarea<=contadorTarea && numTarea>0 ){
+                break;
+            }
+            cout << "La tarea que ingresaste es inválida o no existe.\nVuelva a ingresar el número de la tarea: ";
+        }while (true);
+        
+        cout << "\nLa tarea que eliminaste es: "<< endl;
+        cout << endl << "       Tarea " << numTarea << ": " << tarea[numTarea-1].nombre;
+        
+        numTarea--;
+
+        TareaEliminada[contadorEliminado]=tarea[numTarea];
+        for (int i = numTarea; i < contadorTarea - 1; i++) {
+            tarea[i] = tarea[i + 1];
+        }
+
+        
+        tarea[contadorTarea - 1].anio = 0;
+        tarea[contadorTarea - 1].codigoTarea = "";
+        tarea[contadorTarea - 1].curso = "";
+        tarea[contadorTarea - 1].descripcion = "";
+        tarea[contadorTarea - 1].dia = 0;
+        tarea[contadorTarea - 1].estado = "";
+        tarea[contadorTarea - 1].mes = 0;
+        tarea[contadorTarea - 1].nombre = "";
+        tarea[contadorTarea - 1].nota = 0;
+
+        contadorTarea--;
+        contadorEliminado++;
+        system("PAUSE");
+        contadorTarea--;
+
+        contadorEliminado++;
+        system("PAUSE");
+    }
+
+
 }
