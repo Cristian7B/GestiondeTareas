@@ -324,74 +324,9 @@ int crearNTareas(Estudiante &estudiante, Tarea tareas[100], Cursos materias[], i
     string repeticion = "s";
 
     while(repeticion == "s" && contadorTarea < 100) {
-        system("CLS");
-        cout << "Tarea " << contadorTarea+1 << endl;
-        cout << "--------------------\n";
-        cin.ignore();
-
-        cout << "Ingresa el nombre de la tarea: ";
-        getline(cin, tareas[contadorTarea].nombre);
-        
-        cout << "Ingresa la descripción de la tarea: ";
-        getline(cin, tareas[contadorTarea].descripcion);
-
-        cout << "Ingrese el codigo del curso al que pertenece la materia, las materias son: \n";
-        cout << endl;
-
-        cout << left << setw(20) << "Materia" << setw(10) << "Codigo" << endl;
-        for(i = 0; i < estudiante.numMateriasInscritas ; i++) {
-            cout << setw(20) << left << estudiante.materias[i].nombre << setw(10) << left << estudiante.materias[i].codigo << endl;
-        }
-
-        cout << endl << "Ingrese código: ";
-
-        int cantmaterias=i;
-
-        do{ //Validación del ingreso del codigo del curso en la tarea
-            int numTarea=0;
-            getline(cin, tareas[contadorTarea].curso);
-            for (int i=0;i<cantmaterias;i++){
-                if ( tareas[contadorTarea].curso==estudiante.materias[i].codigo){
-                    numTarea++;
-                    break;
-                }
-            }
-            if (numTarea!=0){
-                break;
-            }
-            cout << "El código que ingreso no pertenece a ninguna materia, ingrese de nuevo el código: ";
-        }while (true);
-
-
-    
-        
-        
-        cout << "\nFecha de entrega de la tarea.\n";
-        cout << "--------------------\n";
-
-        //Fechas
-        tareas[contadorTarea].anio = obtenerAnio();
-        tareas[contadorTarea].mes = obtenerMes(tareas[contadorTarea].anio);
-        tareas[contadorTarea].dia = obtenerDia(tareas[contadorTarea].mes, tareas[contadorTarea].anio);
-        tareas[contadorTarea].codigoTarea = crearCodigo(estudiante, tareas[contadorTarea].curso);    
-        
-        tareas[contadorTarea].estado = "En proceso";
-
-        contadorTarea++;
-        
+        contadorTarea = crearTarea(estudiante, tareas, materias, contadorTarea);         
         cout << "¿Desea agregar otra tarea? s/n: ";
         cin >> repeticion;
-    }
-
-    for (i=0; i < contadorTarea; i++) {
-        cout << endl << "Nombre de la tarea "<< i+1 << ": " << tareas[i].nombre << endl;
-        cout << "Descripcion: " << tareas[i].descripcion << endl;
-        cout << "Estado: " << tareas[i].estado << endl;
-        cout << "Curso: " << tareas[i].curso << endl;
-        cout << "Codigo: " << tareas[i].codigoTarea << endl;
-        cout << "Año de entrega: " << tareas[i].anio << endl;
-        cout << "Mes de entrega: " << tareas[i].mes << endl;
-        cout << endl;
     }
 
     return contadorTarea;
