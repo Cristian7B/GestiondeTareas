@@ -793,7 +793,6 @@ int obtenercodigo(){
 
 int indiceTarea(Tarea tareas[], int contadorTarea) {
     int i, opcion, tareaModificar, indiceTarea;
-
     cout << "\nEscoja la tarea donde se realizarán los cambios.\n";
 
     for (i=0; i < contadorTarea; i++) {
@@ -1097,21 +1096,22 @@ void eliminarTarea(Tarea tarea[],Tarea TareaEliminada[], int contadorTarea, int 
         cout << endl << "       Tarea " << numTarea << ": " << tarea[numTarea-1].nombre;
         numTarea--;
 
-        TareaEliminada[contadorEliminado]=tarea[numTarea];
+        TareaEliminada[contadorEliminado].nombre=tarea[numTarea].nombre;
 
         for (int i = numTarea; i < contadorTarea - 1; i++) {
             if (i==contadorTarea-2){
                 tarea[contadorTarea - 1].nombre=tarea[contadorTarea-1].nombre + "(Tarea eliminada)" ;
             }else{
                 tarea[i] = tarea[i + 1];
+            }
         }
 
 
 
 
         contadorTarea--;
-
         contadorEliminado++;
+        cout<<contadorTarea<<endl<<contadorEliminado;
         system("PAUSE");
     }
 
