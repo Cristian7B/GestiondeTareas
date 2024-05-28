@@ -11,6 +11,7 @@ Fecha: 5 de Junio
 #include <iomanip>
 #include <sstream>
 #include <cctype>
+#include <vector>
 
 using namespace std;
 
@@ -57,7 +58,7 @@ void registrarMaterias(Estudiante &estudiante);
 // Funciones de las tareas
 int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea);
 int crearNTareas(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea);
-int eliminarTarea(Tarea tarea[],Tarea TareaEliminada[], int contadorTarea, int contadorEliminado);
+void eliminarTarea(Tarea tarea[],Tarea TareaEliminada[], int contadorTarea, int contadorEliminado);
 void modificarTarea(Tarea tareas[], int contadorTarea);
 void cambiarEstadoTarea(Tarea tareas[], int contadorTarea);
 void estadoTarea(Tarea &tarea);
@@ -1066,7 +1067,7 @@ bool validarNombre(string nombre){
     return nombreValido;
 }
 
-int eliminarTarea(Tarea tarea[],Tarea TareaEliminada[], int contadorTarea, int contadorEliminado){
+void eliminarTarea(Tarea tarea[],Tarea TareaEliminada[], int contadorTarea, int contadorEliminado){
     int numTarea;
     system("CLS");
     if (contadorTarea==0){
@@ -1094,33 +1095,25 @@ int eliminarTarea(Tarea tarea[],Tarea TareaEliminada[], int contadorTarea, int c
 
         cout << "\nLa tarea que eliminaste es: "<< endl;
         cout << endl << "       Tarea " << numTarea << ": " << tarea[numTarea-1].nombre;
+        numTarea--;
 
+        TareaEliminada[contadorEliminado]=tarea[numTarea];
 
-        TareaEliminada[contadorEliminado]=tarea[numTarea-1];
         for (int i = numTarea; i < contadorTarea - 1; i++) {
-            tarea[i] = tarea[i + 1];
+            if (i==contadorTarea-2){
+                tarea[contadorTarea - 1].nombre=tarea[contadorTarea-1].nombre + "(Tarea eliminada)" ;
+            }else{
+                tarea[i] = tarea[i + 1];
         }
 
 
-        tarea[contadorTarea - 1].anio = 0;
-        tarea[contadorTarea - 1].codigoTarea = "";
-        tarea[contadorTarea - 1].curso = "";
-        tarea[contadorTarea - 1].descripcion = "";
-        tarea[contadorTarea - 1].dia = 0;
-        tarea[contadorTarea - 1].estado = "";
-        tarea[contadorTarea - 1].mes = 0;
-        tarea[contadorTarea - 1].nombre = "";
-        tarea[contadorTarea - 1].nota = 0;
 
-        contadorTarea--;
-        contadorEliminado++;
-        system("PAUSE");
+
         contadorTarea--;
 
         contadorEliminado++;
         system("PAUSE");
     }
-    return contadorTarea, contadorEliminado;
 
 }
 
