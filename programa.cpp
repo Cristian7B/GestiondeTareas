@@ -58,7 +58,7 @@ void registrarMaterias(Estudiante &estudiante);
 // Funciones de las tareas
 int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea);
 int crearNTareas(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea);
-void eliminarTarea(Tarea tarea[],Tarea TareaEliminada[], int contadorTarea, int contadorEliminado);
+int eliminarTarea(Tarea tarea[],Tarea TareaEliminada[], int contadorTarea, int contadorEliminado);
 void modificarTarea(Tarea tareas[], int contadorTarea);
 void cambiarEstadoTarea(Tarea tareas[], int contadorTarea);
 void estadoTarea(Tarea &tarea);
@@ -93,8 +93,7 @@ main() {
     system("cls");
 
     //Variales globales
-    int decision = 0, contadorMateria = 0, opcion = 0, contadorTarea = 0, contadorEliminado=0;
-
+    int decision = 0, contadorMateria = 0, opcion = 0, contadorTarea = 0, contadorEliminado=0, condicionEliminar=0;
     cout << "¡Bienvenido a tu sistema de gestion de tareas personal!\n";
 
     system("PAUSE");
@@ -143,7 +142,12 @@ main() {
                 break;
 
             case 5:
-                eliminarTarea( tareas, tareaEliminada,  contadorTarea,  contadorEliminado);
+                condicionEliminar=eliminarTarea( tareas, tareaEliminada,  contadorTarea,  contadorEliminado);
+                if (condicionEliminar==0){
+                }else{
+                    contadorTarea--;
+                    contadorEliminado++;
+                }
                 break;
             case 6:
                 historialTareas( tareas, tareaEliminada, contadorTarea, contadorEliminado, perfil);
@@ -793,7 +797,8 @@ int obtenercodigo(){
 
 int indiceTarea(Tarea tareas[], int contadorTarea) {
     int i, opcion, tareaModificar, indiceTarea;
-    cout << "\nEscoja la tarea donde se realizarán los cambios.\n";
+    cout<<contadorTarea;
+    cout << "\nEscoja la tarea donde se realizarán los cambios.\n"<<contadorTarea<<endl;
 
     for (i=0; i < contadorTarea; i++) {
         cout << endl << i+1 << ". " << tareas[i].nombre << endl;
@@ -1066,21 +1071,22 @@ bool validarNombre(string nombre){
     return nombreValido;
 }
 
-void eliminarTarea(Tarea tarea[],Tarea TareaEliminada[], int contadorTarea, int contadorEliminado){
-    int numTarea;
+int eliminarTarea(Tarea tarea[],Tarea TareaEliminada[], int contadorTarea, int contadorEliminado){
+    int numTarea, condicionEliminar;
     system("CLS");
-    if (contadorTarea==0){
+    if (contadorTarea==0){  //Condicion si no existen tareas para borrar
         cout << "No tiene ninguna tarea actualmente\n ";
         system("PAUSE");
-    }else{
+        condicionEliminar=0;
+    }else{  //Condición si existen tareas para borrar
         cout<<"Las tareas creadas anteriormente son: "<< endl << endl;
-        for (int i=0; i<contadorTarea;i++){
+        for (int i=0; i<contadorTarea;i++){     //Impresión del número de la tarea con la tarea. Ejemplo: Tarea 1: cartelera
             if (tarea[i].nombre!=""){
                 cout << "       Tarea " << i+1 <<": " << tarea[i].nombre<<endl;   
             }
         }
         cout<<"\nIngrese el número de la tarea que deséa eliminar: ";
-        do{
+        do{     //Validación en caso de que el usuario un número de una tarea que no exista o ingrese letras
             cin >> numTarea;
             if (cin.fail()){
                 cin.clear();
@@ -1092,39 +1098,44 @@ void eliminarTarea(Tarea tarea[],Tarea TareaEliminada[], int contadorTarea, int 
             cout << "La tarea que ingresaste es inválida o no existe.\nVuelva a ingresar el número de la tarea: ";
         }while (true);
 
+        numTarea--; //Restamos 1 al número de la tarea para convertirlo en el índice de tarea[i] 
+
+        //Impresión de la tarea eliminada
         cout << "\nLa tarea que eliminaste es: "<< endl;
-        cout << endl << "       Tarea " << numTarea << ": " << tarea[numTarea-1].nombre;
-        numTarea--;
+        cout << endl << "       Tarea " << numTarea+1 << ": " << tarea[numTarea].nombre;
 
-        TareaEliminada[contadorEliminado].nombre=tarea[numTarea].nombre;
+        TareaEliminada[contadorEliminado]=tarea[numTarea];  //Asignamos un nuevo vector donde en un futuro se establecerán todas las tareas eliminadas
 
-        for (int i = numTarea; i < contadorTarea - 1; i++) {
-            if (i==contadorTarea-2){
-                tarea[contadorTarea - 1].nombre=tarea[contadorTarea-1].nombre + "(Tarea eliminada)" ;
+        for (int i = numTarea; i < contadorTarea ; i++) {   //for para que desde la tarea que se elimine todas las tareas se corran un puesto para atras
+            if (i==contadorTarea-1){
             }else{
                 tarea[i] = tarea[i + 1];
             }
-        }
+        }   
 
+        //Ejemplo de la asignación al final del for: se elimina tarea 3. Entonces la tarea 4 pasará a ser 3, la tarea 5 pasará a la 4 y asi sucesivamente
+        //En el último ciclo del for, el bucle no hará nada, para que se deje la última tarea quieta, hasta acá la tarea n y la tarea n-1 serán iguales
 
-
-
-        contadorTarea--;
-        contadorEliminado++;
-        cout<<contadorTarea<<endl<<contadorEliminado;
+        condicionEliminar=1;
+        //Finalmente en el main() se declará que el contador eliminado(contador que cuenta cuantas tareas se han eliminado) aumenta uno, y el contador de las tareas disminuye en uno
+    
         system("PAUSE");
     }
-
+    //En el main hay una condición para que se sume uno al contador eliminado y reste uno al contador de tareas, y este es el valor de condicionEliminar, y para esto lo retornamos
+    return condicionEliminar;
 }
 
 void historialTareas(Tarea tarea[],Tarea TareaEliminada[],int contadorTarea,int contadorEliminado, Estudiante &estudiante){
+
+    //Para esta función es importante tener en cuenta que anteriormente ya habíamos validado que el ingreso del código del curso en una tarea, concuerde con algún curso.
+
     system("CLS");
-    string buscador;
+    string buscador;    //Se declara buscador, porque ahorita se le pedirá al usuario que materia quiere ver el historial, preguntandole el código de la materia
     int numTarea=0, contadorTareasEliminadas=0, contadorTareasActuales=0;
-    if (contadorTarea==0 && contadorEliminado==0){
+    if (contadorTarea==0 && contadorEliminado==0){  //Condición si no existe ninguna tarea, ni ninguna tarea eliminada
         cout << "No ha ingresado ninguna tarea. Por lo tanto no tiene ningún historial.\n\n";
         system("PAUSE");
-    }else if(contadorTarea==0 && contadorEliminado!=0){
+    }else if(contadorTarea==0 && contadorEliminado!=0){ //Condición si no existe ninguna tarea, pero si has eliminado tareas
         cout<< "No tienes ninguna tarea actualmente, sin embargo, puedes buscar que tareas has eliminado en las siguientes materias: ";
         cout<<endl<<endl;
         cout << left << setw(20) << "Materia" << setw(10) << "Código" << endl;
@@ -1133,36 +1144,68 @@ void historialTareas(Tarea tarea[],Tarea TareaEliminada[],int contadorTarea,int 
             cout << setw(20) << left << estudiante.materias[i].nombre << setw(10) << left << estudiante.materias[i].codigo << endl;
         }
 
-        cout<< "Ingrese el código de la materia al cual deséas saber que tareas has eliminado: "<<endl ;
-        cin>>buscador;
-        numTarea=0;
-        cout<< endl<<endl<<"Tareas eliminadas: \n";
+        //Ingreso del código de la materia por el usuario
+        cout<< "\n\nIngrese el código de la materia al cual deséas saber que tareas has eliminado: " ;
+
+        //Validación del ingreso para que concuerde el código que ingresa el usuario y los códigos que tienen las materias
+        do{
+            cin>>buscador;
+            for (int i=0; i<estudiante.numMateriasInscritas;i++){
+                if (buscador==estudiante.materias[i].codigo){
+                    break;
+                }
+            }
+            cout<<endl<<"El código que ingreso no pertenece a ninguna materia."<<endl<<"Ingrese nuevamente el código de la materia: ";
+        }while (true);
+
+        numTarea=0; //contador para imprimir el número de la tarea, es decir tarea 1 y asi sucesivamente.
+        cout<< endl<<endl<<"Tareas eliminadas: \n\n";
+
+        //Se hace un for para que pase por todas las tareas eliminadas
         for (int i=0;i<contadorEliminado;i++){
-            if (buscador==TareaEliminada[i].curso){
+            if (buscador==TareaEliminada[i].curso){ //Condición en caso de que el buscador sea igual al código de curso que le asignamos al crear la tarea
                 numTarea++;
-                cout<<"Tarea eliminada "<<numTarea<<": "<< TareaEliminada[i].nombre<<endl;
+                cout<<"Tarea "<<numTarea<<": "<< TareaEliminada[i].nombre<<endl;
                 contadorTareasEliminadas++;
             }  
         }
+        //Si ningún caso en el for cumplirá la condición no se imprimira nada
         cout<<endl<<endl;
+        //Condicion en caso de que en la materia ingresada no se haya eliminado ninguna tarea
         if (contadorTareasEliminadas==0){
             cout<<"No has eliminado ninguna tarea en esta materia.\n\n";
         }
         system("PAUSE");
-    }else{
+    }else{  //El código de esta condición tiene una lógica muy similar a la de la condición anterior
+        
         cout<< "Las materias con su código respectivamente son: "<<endl<<endl;
         cout << left << setw(20) << "Materia" << setw(10) << "Código" << endl;
         for(int i = 0; i < estudiante.numMateriasInscritas ; i++) {	//impresión de nombre y código de materia
             cout << setw(20) << left << estudiante.materias[i].nombre << setw(10) << left << estudiante.materias[i].codigo << endl;
         }
 
-        cout<< "Ingrese el código de la materia al cual desea saber que tareas tienes actualmente: " ;
-        cin>>buscador;
+        //Ingreso de código de la materia
+        cout<< "\n\nIngrese el código de la materia al cual desea saber que tareas tienes actualmente: " ;
+        //Validación del código de la materia
+        do{
+            cin>>buscador;
+            for (int i=0; i<estudiante.numMateriasInscritas;i++){
+                if (buscador==estudiante.materias[i].codigo){
+                    break;
+                }
+            }
+            cout<<endl<<"El código que ingreso no pertenece a ninguna materia."<<endl<<"Ingrese nuevamente el código de la materia: ";
+        }while (true);
+
+        cout<<endl<<endl;
+        //Impresión: historial total de la <materia> 
         for (int i=0;i<estudiante.numMateriasInscritas;i++){
             if (buscador==estudiante.materias[i].codigo){
                 cout<< "El historial total de tareas en la materia "<<estudiante.materias[i].nombre<<" es: "<<endl<<endl<<endl;
             }
         }
+
+        //Impresión de cada tarea
         cout<<"Tareas: "<<endl<<endl;
         for (int i=0;i<contadorTarea;i++){
             if (buscador== tarea[i].curso){
@@ -1173,21 +1216,26 @@ void historialTareas(Tarea tarea[],Tarea TareaEliminada[],int contadorTarea,int 
                 contadorTareasActuales++;
             }
         }
+        //Impresión si no ha creado ninguna tarea en esa materia o si ha eliminado todas las tareas en esa materia
         if (contadorTareasActuales==0){
-            cout<< "No tienes ninguna tarea en esta materia: ";
+            cout<< "\n\nNo tienes ninguna tarea en esta materia: ";
         }
         numTarea=0;
-        cout<< endl<<endl<<"Tareas eliminadas: ";
+
+        //Impresión de las tareas eliminadas
+        cout<< endl<<endl<<"Tareas eliminadas: "<<endl<<endl;
         for (int i=0;i<contadorEliminado;i++){
             if (buscador==TareaEliminada[i].curso){
                 numTarea++;
-                cout<<"Tarea eliminada "<<numTarea<<": "<< TareaEliminada[i].nombre<<endl;
+                cout<<"Tarea "<<numTarea<<": "<< TareaEliminada[i].nombre<<endl;
                 contadorTareasEliminadas++;
             } 
         }
+
+        //Condición en caso de que no haya eliminado ninguna tarea en esa materia
         cout << "\n\n";
         if (contadorTareasEliminadas==0){
-            cout << "No tienes ninguna tarea eliminada en esta materia.\n\n ";
+            cout << "\n\nNo tienes ninguna tarea eliminada en esta materia.\n\n ";
         }
         system("PAUSE");
     }
