@@ -12,6 +12,7 @@ Fecha: 5 de Junio
 #include <sstream>
 #include <cctype>
 #include <vector>
+#include <cmath>
 
 using namespace std;
 
@@ -306,8 +307,7 @@ int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int co
     //Fechas
     tareas[contadorTarea].anio = obtenerAnio();
     tareas[contadorTarea].mes = obtenerMes(tareas[contadorTarea].anio);
-    tareas[contadorTarea].dia = obtenerDia(tareas[contadorTarea].mes, tareas[contadorTarea].anio);
-    tareas[contadorTarea].codigoTarea = crearCodigo(estudiante, tareas[contadorTarea].curso);    
+    tareas[contadorTarea].dia = obtenerDia(tareas[contadorTarea].mes, tareas[contadorTarea].anio);   
 
 
     tareas[contadorTarea].estado = "En proceso";
@@ -322,6 +322,7 @@ int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int co
         cout << "Codigo: " << tareas[i].codigoTarea << endl;
         cout << "Año de entrega: " << tareas[i].anio << endl;
         cout << "Mes de entrega: " << tareas[i].mes << endl;
+        cout << "Dia de entrega: " <<tareas[i].dia << endl;
         cout << endl;
     }
 
@@ -384,7 +385,6 @@ int crearNTareas(Estudiante &estudiante, Tarea tareas[100], Cursos materias[], i
         tareas[contadorTarea].mes = obtenerMes(tareas[contadorTarea].anio);
         tareas[contadorTarea].dia = obtenerDia(tareas[contadorTarea].mes, tareas[contadorTarea].anio);
         tareas[contadorTarea].codigoTarea = crearCodigo(estudiante, tareas[contadorTarea].curso);    
-
         tareas[contadorTarea].estado = "En proceso";
 
         contadorTarea++;
@@ -782,17 +782,17 @@ string obtenerNombre(string aPedir){
 int obtenercodigo(){
     float codigo;
 
-    cout << "Ingrese el código de estudiante: ";
+    cout << "Ingrese el código de estudiante (solo recibe números enteros): ";
     cin >> codigo;
 
-    while(cin.fail() || codigo < 0){
+    while(cin.fail() || codigo <= 0 || fmod(codigo,1)!=0){
         cin.clear();
-        cin.ignore();
-        cout << "Ingrese solamente valores númericos: ";
+        cin.ignore(200, '\n');
+        cout << "Solamente recibe codigos como números naturales, ingrese nuevamente el código: ";
         cin >> codigo;
     }
 
-    return float(codigo);
+    return int(codigo);
 }
 
 int indiceTarea(Tarea tareas[], int contadorTarea) {
@@ -935,26 +935,22 @@ bool validarcorreo(string correo){
 
 string crearCodigo(Estudiante &estudiante, string codigoMateria){
     string codigo;
-    bool codigoValido = false;
     Cursos materia;
 
     //Validar un código valido
     do{
         for(int i = 0; i < estudiante.numMateriasInscritas; i++){
-            if (estudiante.materias[i].codigo == codigoMateria){
-                codigoValido = true; 
+            if (estudiante.materias[i].codigo == codigoMateria){ 
                 materia = estudiante.materias[i];
                 codigo = materia.codigo + to_string(materia.cantidad);
                 //Incrementar la cantidad de tareas de esa materia
                 estudiante.materias[i].cantidad++;
                 break;
-        }
-        if (!codigoValido){
             }
+        }
             cout << "Ingrese un código valido, intente nuevamente: ";
             cin >> codigoMateria;
-        }
-    } while (!codigoValido);
+    } while (true);
 
 
     materia.cantidad ++;
@@ -1150,10 +1146,15 @@ void historialTareas(Tarea tarea[],Tarea TareaEliminada[],int contadorTarea,int 
         //Validación del ingreso para que concuerde el código que ingresa el usuario y los códigos que tienen las materias
         do{
             cin>>buscador;
+            int j;
             for (int i=0; i<estudiante.numMateriasInscritas;i++){
                 if (buscador==estudiante.materias[i].codigo){
+                    j=1;
                     break;
                 }
+            }
+            if (j==1){
+                break;
             }
             cout<<endl<<"El código que ingreso no pertenece a ninguna materia."<<endl<<"Ingrese nuevamente el código de la materia: ";
         }while (true);
