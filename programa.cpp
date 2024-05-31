@@ -155,13 +155,13 @@ main() {
 
         switch (opcion) {
             case 1:
-                contadorTarea = crearTarea(perfil, tareas, materias, contadorTarea);
+                contadorTarea = crearTarea(perfil, tareas, contadorTarea);
                 system("pause");
                 guardarTareasEnFichero(tareas, contadorTarea);
                 break;
 
             case 2:
-                contadorTarea = crearNTareas(perfil, tareas, materias, contadorTarea);
+                contadorTarea = crearNTareas(perfil, tareas, contadorTarea);
                 system("pause");
                 guardarTareasEnFichero(tareas, contadorTarea);
                 break;
@@ -478,7 +478,7 @@ int crearNTareas(Estudiante &estudiante, Tarea tareas[100], Cursos materias[], i
         cin >> repeticion;
     }
 
-    for (i=0; i < contadorTarea; i++) {
+    for (int i=0; i < contadorTarea; i++) {
         cout << endl << "Nombre de la tarea "<< i+1 << ": " << tareas[i].nombre << endl;
         cout << "Descripcion: " << tareas[i].descripcion << endl;
         cout << "Estado: " << tareas[i].estado << endl;
@@ -486,6 +486,7 @@ int crearNTareas(Estudiante &estudiante, Tarea tareas[100], Cursos materias[], i
         cout << "Codigo: " << tareas[i].codigoTarea << endl;
         cout << "Año de entrega: " << tareas[i].anio << endl;
         cout << "Mes de entrega: " << tareas[i].mes << endl;
+        cout << "Día de entrega: " << tareas[i].dia << endl;
         cout << endl;
     }
 
@@ -1125,7 +1126,7 @@ bool validarcorreo(string correo){
 }
 
 string crearCodigo(Estudiante &estudiante, string codigoMateria){
-    string codigo;
+    string codigo = "";
     bool codigoValido = false;
     Cursos materia;
 
@@ -1135,13 +1136,15 @@ string crearCodigo(Estudiante &estudiante, string codigoMateria){
             if (estudiante.materias[i].codigo == codigoMateria){
                 codigoValido = true;
                 materia = estudiante.materias[i];
-                codigo = materia.codigo + to_string(materia.cantidad);
+                codigo += materia.codigo;
+                codigo += materia.cantidad;
 
                 //Incrementar la cantidad de tareas de esa materia
                 estudiante.materias[i].cantidad++;
                 break;
             }
         }
+
         if (!codigoValido){
             cout << "Ingrese un código valido, intente nuevamente: ";
             cin >> codigoMateria;
