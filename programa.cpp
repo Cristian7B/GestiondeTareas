@@ -13,6 +13,7 @@ Fecha: 5 de Junio
 #include <cctype>
 #include <vector>
 #include <cmath>
+#include <fstream>
 
 using namespace std;
 
@@ -50,11 +51,17 @@ struct Tarea {
     Cursos materia;
 };
 
-//FUNCIONES
+//PROTOTIPADO DE LAS FUNCIONES DEL PROGRAMA
 
-// Prototipado de funciones
 void registrarEstudiante(Estudiante &estudiante);
 void registrarMaterias(Estudiante &estudiante); 
+
+// Funciones para los ficheros
+
+bool leerEstudianteDesdeFichero(Estudiante &estudiante);
+void guardarEstudianteEnFichero(Estudiante &estudiante);
+bool leerTareasDesdeFichero(Tarea tareas[], int &contadorTarea);
+void guardarTareasEnFichero(const Tarea tareas[], int contadorTarea);
 
 // Funciones de las tareas
 int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea);
@@ -100,8 +107,27 @@ main() {
     system("PAUSE");
     system("CLS");
 
-    cout << "Es hora de registrar tu perfil.\n";
-    registrarEstudiante(perfil);
+    if (!leerEstudianteDesdeFichero(perfil))
+    {
+        cout << "Es hora de registrar tu perfil.\n";
+        registrarEstudiante(perfil);
+        guardarEstudianteEnFichero(perfil);
+    }
+
+    else
+    {
+        cout << "Perfil cargado exitosamente.\n";
+        cout << "Bienvenido " << perfil.nombre << ".\n";
+        system("PAUSE");
+    }
+
+    if (leerTareasDesdeFichero(tareas, contadorTarea))
+    {
+        system("CLS");
+        cout << contadorTarea << " Tareas han sido cargadas exitosamente.\n";
+        system("PAUSE");
+    }
+
 
     // Menú de opciones
     while (decision == 0) {
@@ -253,6 +279,55 @@ void registrarMaterias(Estudiante &estudiante) {
     estudiante.numMateriasInscritas += numMateriasRegistradas;
 }
 
+bool leerEstudianteDesdeFichero(Estudiante &estudiante)
+{
+    ifstream fichero("estudiante.txt");
+    if (fichero.is_open())
+    {
+        getline(fichero, estudiante.nombre);
+        getline(fichero, estudiante.apellido);
+        getline(fichero, estudiante.correo);
+        fichero >> estudiante.codigo;
+        fichero >> estudiante.numMateriasInscritas;
+        fichero.ignore(); 
+
+        for (int i = 0; i < estudiante.numMateriasInscritas; ++i)
+        {
+            getline(fichero, estudiante.materias[i].nombre);
+            getline(fichero, estudiante.materias[i].codigo);
+            fichero >> estudiante.materias[i].cantidad;
+            fichero >> estudiante.materias[i].cantidadMaterias;
+            fichero.ignore(); 
+        }
+        fichero.close();
+        return true;
+    }
+    return false;
+}
+
+void guardarEstudianteEnFichero(Estudiante &estudiante)
+{
+    ofstream fichero("estudiante.txt");
+    if (fichero.is_open())
+    {
+        fichero << estudiante.nombre << endl;
+        fichero << estudiante.apellido << endl;
+        fichero << estudiante.correo << endl;
+        fichero << estudiante.codigo << endl;
+        fichero << estudiante.numMateriasInscritas << endl;
+
+        for (int i = 0; i < estudiante.numMateriasInscritas; ++i)
+        {
+            fichero << estudiante.materias[i].nombre << endl;
+            fichero << estudiante.materias[i].codigo << endl;
+            fichero << estudiante.materias[i].cantidad << endl;
+            fichero << estudiante.materias[i].cantidadMaterias << endl;
+        }
+        fichero.close();
+    }
+}
+
+
 
 int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea){
     system("CLS");
@@ -303,12 +378,12 @@ int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int co
     //Fechas
     tareas[contadorTarea].anio = obtenerAnio();
     tareas[contadorTarea].mes = obtenerMes(tareas[contadorTarea].anio);
-    tareas[contadorTarea].dia = obtenerDia(tareas[contadorTarea].mes, tareas[contadorTarea].anio);   
-
+    tareas[contadorTarea].dia = obtenerDia(tareas[contadorTarea].mes, tareas[contadorTarea].anio);      
 
     tareas[contadorTarea].estado = "En proceso";
 
     contadorTarea++;
+    guardarTareasEnFichero(tareas, contadorTarea);
 
     for (i=0; i < contadorTarea; i++) {
         cout << endl << "Nombre de la tarea "<< i+1 << ": " << tareas[i].nombre << endl;
@@ -401,6 +476,56 @@ int crearNTareas(Estudiante &estudiante, Tarea tareas[100], Cursos materias[], i
     }
 
     return contadorTarea;
+}
+
+void guardarTareasEnFichero(const Tarea tareas[], int contadorTarea)
+{
+    ofstream fichero("tareas.txt");
+    if (fichero.is_open())
+    {
+        fichero << contadorTarea << endl;
+
+        for (int i = 0; i < contadorTarea; ++i)
+        {
+            fichero << tareas[i].nombre << endl;
+            fichero << tareas[i].descripcion << endl;
+            fichero << tareas[i].codigoTarea << endl;
+            fichero << tareas[i].curso << endl;
+            fichero << tareas[i].estado << endl;
+            fichero << tareas[i].dia << endl;
+            fichero << tareas[i].mes << endl;
+            fichero << tareas[i].anio << endl;
+            fichero << tareas[i].nota << endl;
+        }
+        fichero.close();
+    }
+}
+
+bool leerTareasDesdeFichero(Tarea tareas[], int &contadorTarea)
+{
+    ifstream fichero("tareas.txt");
+    if (fichero.is_open())
+    {
+        fichero >> contadorTarea;
+        fichero.ignore(); 
+
+        for (int i = 0; i < contadorTarea; ++i)
+        {
+            getline(fichero, tareas[i].nombre);
+            getline(fichero, tareas[i].descripcion);
+            getline(fichero, tareas[i].codigoTarea);
+            getline(fichero, tareas[i].curso);
+            getline(fichero, tareas[i].estado);
+            fichero >> tareas[i].dia;
+            fichero >> tareas[i].mes;
+            fichero >> tareas[i].anio;
+            fichero >> tareas[i].nota;
+            fichero.ignore(); 
+        }
+        fichero.close();
+        return true;
+    }
+    return false;
 }
 
 void modificarTarea(Tarea tareas[], int contadorTarea) {

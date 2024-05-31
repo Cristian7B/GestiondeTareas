@@ -46,27 +46,14 @@ struct Tarea
     Cursos materia;
 };
 
-// FUNCIONES
-
 // Prototipado de funciones
 void registrarEstudiante(Estudiante &estudiante);
 void registrarMaterias(Estudiante &estudiante);
 bool leerEstudianteDesdeFichero(Estudiante &estudiante);
 void guardarEstudianteEnFichero(const Estudiante &estudiante);
-
-// Funciones de las tareas
 int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea);
-int crearNTareas(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea);
-void buscarFechaTarea(Tarea tareas[], int contadorTarea);
-void cambiarEstadoTarea(Tarea tareas[], int contadorTarea);
-int eliminarTarea(Tarea tarea[], Tarea TareaEliminada[], int contadorTarea, int contadorEliminado);
-void estadoTarea(Tarea &tarea);
-void modificarTarea(Tarea tareas[], int contadorTarea);
-
-// Consultas
-void tareasMateria(Tarea &tarea);
-void tareasFecha(Tarea &tarea);
-void historialTareas(Tarea tarea[], Tarea TareaEliminada[], int contadorTarea, int contadorEliminado, Estudiante &estudiante);
+bool leerTareasDesdeFichero(Tarea tareas[], int &contadorTarea);
+void guardarTareasEnFichero(const Tarea tareas[], int contadorTarea);
 
 // Funciones adicionales
 int obtenercodigo();
@@ -75,25 +62,24 @@ int obtenerMes(int anio);
 int obtenerDia(int mes, int anio);
 string obtenerCorreo();
 string obtenerNombre(string aPedir);
-int indiceTarea(Tarea tareas[], int contadorTarea);
-int indiceTareaEstado(Tarea tareas[], int contadorTarea);
 bool validarNombre(string nombre);
 string crearCodigo(Estudiante &estudiante, string cursoNombre);
 
 int main()
 {
-    // Vectorizacion de los struct
-    Tarea tareas[100], tareaEliminada[100];
+    // Vectorización de los struct
+    Tarea tareas[100];
     Cursos materias[15];
     Estudiante perfil;
+    int contadorTarea = 0;
 
     setlocale(LC_ALL, "spanish");
     system("cls");
 
     // Variables globales
-    int decision = 0, contadorMateria = 0, opcion = 0, contadorTarea = 0, contadorEliminado = 0, condicionEliminar = 0;
-    cout << "¡Bienvenido a tu sistema de gestion de tareas personal!\n";
+    int decision = 0, opcion = 0;
 
+    cout << "¡Bienvenido a tu sistema de gestión de tareas personal!\n";
     system("PAUSE");
     system("CLS");
 
@@ -106,6 +92,18 @@ int main()
     else
     {
         cout << "Perfil cargado exitosamente.\n";
+        system("PAUSE");
+    }
+
+    if (leerTareasDesdeFichero(tareas, contadorTarea))
+    {
+        cout << contadorTarea << endl;
+        cout << "Tareas cargadas exitosamente.\n";
+
+        for ( int i = 0; i <contadorTarea; i++ ){
+            cout << tareas[i].nombre << endl;
+            cout << tareas[i].descripcion << endl;
+        }
         system("PAUSE");
     }
 
@@ -127,39 +125,41 @@ int main()
         cout << "\t 7. Consultar tareas para una fecha específica.\n";
         cout << "\n0. Salir del programa.\n";
 
-        cout << "\nOpcion: ";
+        cout << "\nOpción: ";
         cin >> opcion;
 
         switch (opcion)
         {
         case 1:
+            contadorTarea = crearTarea(perfil, tareas, materias, contadorTarea);
+
+             
             system("pause");
             break;
 
         case 2:
+            // Implementación para crear n tareas
             system("pause");
             break;
 
         case 3:
+            // Implementación para modificar tarea
             break;
 
         case 4:
+            // Implementación para cambiar estado de tarea
             break;
 
         case 5:
-            if (condicionEliminar == 0)
-            {
-            }
-            else
-            {
-                contadorTarea--;
-                contadorEliminado++;
-            }
+            // Implementación para eliminar tarea
             break;
+
         case 6:
+            // Implementación para consultar historial de tareas de una materia
             break;
 
         case 7:
+            // Implementación para consultar tareas para una fecha específica
             break;
 
         case 0:
@@ -171,23 +171,20 @@ int main()
             break;
         }
     }
+    return 0;
 }
 
 // Funciones
 
-// 1. Función de registrar el estudiante / Visualización de los datos del estudiante.
 void registrarEstudiante(Estudiante &estudiante)
 {
-    // Solicitar nombre, apellido, correo y codigo
+    // Solicitar nombre, apellido, correo y código
     cout << "--------------------\n";
     cout << "Datos personales.\n";
 
     estudiante.nombre = obtenerNombre("nombre");
-
     estudiante.apellido = obtenerNombre("apellido");
-
     estudiante.correo = obtenerCorreo();
-
     estudiante.codigo = obtenercodigo();
 
     registrarMaterias(estudiante);
@@ -206,7 +203,6 @@ void registrarMaterias(Estudiante &estudiante)
     // Solicitar los datos de las materias inscritas
     while (continuar != "n" && estudiante.numMateriasInscritas < 15)
     {
-
         cin.ignore();
 
         cout << "\nIngresa el nombre de la materia: ";
@@ -274,7 +270,6 @@ void registrarMaterias(Estudiante &estudiante)
     estudiante.numMateriasInscritas += numMateriasRegistradas;
 }
 
-
 bool leerEstudianteDesdeFichero(Estudiante &estudiante)
 {
     ifstream fichero("estudiante.txt");
@@ -323,6 +318,97 @@ void guardarEstudianteEnFichero(const Estudiante &estudiante)
     }
 }
 
+void guardarTareasEnFichero(const Tarea tareas[], int contadorTarea)
+{
+    ofstream fichero("tareas.txt");
+    if (fichero.is_open())
+    {
+        fichero << contadorTarea << endl;
+
+        for (int i = 0; i < contadorTarea; ++i)
+        {
+            fichero << tareas[i].nombre << endl;
+            fichero << tareas[i].descripcion << endl;
+            fichero << tareas[i].codigoTarea << endl;
+            fichero << tareas[i].curso << endl;
+            fichero << tareas[i].estado << endl;
+            fichero << tareas[i].dia << endl;
+            fichero << tareas[i].mes << endl;
+            fichero << tareas[i].anio << endl;
+            fichero << tareas[i].nota << endl;
+        }
+        fichero.close();
+    }
+}
+
+bool leerTareasDesdeFichero(Tarea tareas[], int &contadorTarea)
+{
+    ifstream fichero("tareas.txt");
+    if (fichero.is_open())
+    {
+        fichero >> contadorTarea;
+        fichero.ignore(); // Ignorar el salto de línea restante
+
+        for (int i = 0; i < contadorTarea; ++i)
+        {
+            getline(fichero, tareas[i].nombre);
+            getline(fichero, tareas[i].descripcion);
+            getline(fichero, tareas[i].codigoTarea);
+            getline(fichero, tareas[i].curso);
+            getline(fichero, tareas[i].estado);
+            fichero >> tareas[i].dia;
+            fichero >> tareas[i].mes;
+            fichero >> tareas[i].anio;
+            fichero >> tareas[i].nota;
+            fichero.ignore(); // Ignorar el salto de línea restante
+        }
+        fichero.close();
+        return true;
+    }
+    return false;
+}
+
+
+int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea)
+{
+    if (contadorTarea >= 100)
+    {
+        cout << "No se pueden agregar más tareas. Capacidad máxima alcanzada.\n";
+        return contadorTarea;
+    }
+
+    Tarea nuevaTarea;
+
+    cout << "\nCrear nueva tarea\n";
+    cout << "-----------------\n";
+    cout << "Ingrese el nombre de la tarea: ";
+    cin.ignore();
+    getline(cin, nuevaTarea.nombre);
+
+    cout << "Ingrese la descripción de la tarea: ";
+    getline(cin, nuevaTarea.descripcion);
+
+    cout << "Ingrese el curso: ";
+    getline(cin, nuevaTarea.curso);
+
+    cout << "Ingrese el estado de la tarea (En proceso, entregada, no entregada): ";
+    getline(cin, nuevaTarea.estado);
+
+    cout << "Ingrese la fecha de entrega (día mes año): ";
+    cin >> nuevaTarea.dia >> nuevaTarea.mes >> nuevaTarea.anio;
+
+    nuevaTarea.codigoTarea = crearCodigo(estudiante, nuevaTarea.curso);
+
+    tareas[contadorTarea] = nuevaTarea;
+    contadorTarea++;
+
+    guardarTareasEnFichero(tareas, contadorTarea);
+
+    cout << "Tarea creada exitosamente.\n";
+
+    return contadorTarea;
+}
+
 // Funciones adicionales para obtener datos del usuario
 int obtenercodigo()
 {
@@ -353,7 +439,6 @@ string obtenerNombre(string aPedir)
     return nombre;
 }
 
-
 bool validarNombre(string nombre)
 {
     for (char c : nombre)
@@ -366,7 +451,8 @@ bool validarNombre(string nombre)
     return true;
 }
 
-// Implementar las demás funciones necesarias para la gestión de tareas y materias
-
-// ...
-
+string crearCodigo(Estudiante &estudiante, string cursoNombre)
+{
+    // Crear un código para la tarea basado en el código del estudiante y el curso
+    return to_string(estudiante.codigo) + "_" + cursoNombre;
+}
