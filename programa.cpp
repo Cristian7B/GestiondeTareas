@@ -155,13 +155,13 @@ main() {
 
         switch (opcion) {
             case 1:
-                contadorTarea = crearTarea(perfil, tareas, contadorTarea);
+                contadorTarea = crearTarea(perfil, tareas, materias, contadorTarea);
                 system("pause");
                 guardarTareasEnFichero(tareas, contadorTarea);
                 break;
 
             case 2:
-                contadorTarea = crearNTareas(perfil, tareas, contadorTarea);
+                contadorTarea = crearNTareas(perfil, tareas, materias, contadorTarea);
                 system("pause");
                 guardarTareasEnFichero(tareas, contadorTarea);
                 break;
