@@ -9,10 +9,6 @@ Fecha: 5 de Junio
 #include <locale.h>
 #include <string>
 #include <iomanip>
-#include <sstream>
-#include <cctype>
-#include <vector>
-#include <cmath>
 #include <fstream>
 
 using namespace std;
@@ -62,6 +58,8 @@ bool leerEstudianteDesdeFichero(Estudiante &estudiante);
 void guardarEstudianteEnFichero(Estudiante &estudiante);
 bool leerTareasDesdeFichero(Tarea tareas[], int &contadorTarea);
 void guardarTareasEnFichero(const Tarea tareas[], int contadorTarea);
+void guardarTareasEliminadasFichero(Tarea ta_eliminadas[], int contadorEliminado);
+bool leerTareasEliminadasDesdeFichero(Tarea tareas_eliminadas[], int &contadorEliminado);
 
 // Funciones de las tareas
 int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea);
@@ -128,6 +126,12 @@ main() {
         system("PAUSE");
     }
 
+    if (leerTareasEliminadasDesdeFichero(tareaEliminada, contadorEliminado)) {
+        system("CLS");
+        cout << contadorEliminado << " Tareas han sido cargadas exitosamente.\n";
+        system("PAUSE");
+    }
+
 
     // Menú de opciones
     while (decision == 0) {
@@ -153,19 +157,23 @@ main() {
             case 1:
                 contadorTarea = crearTarea(perfil, tareas, materias, contadorTarea);
                 system("pause");
+                guardarTareasEnFichero(tareas, contadorTarea);
                 break;
 
             case 2:
                 contadorTarea = crearNTareas(perfil, tareas, materias, contadorTarea);
                 system("pause");
+                guardarTareasEnFichero(tareas, contadorTarea);
                 break;
 
             case 3:
                 modificarTarea(tareas, contadorTarea);
+                guardarTareasEnFichero(tareas, contadorTarea);
                 break;
 
             case 4:
                 cambiarEstadoTarea(tareas, contadorTarea);
+                guardarTareasEnFichero(tareas, contadorTarea);
                 break;
 
             case 5:
@@ -173,8 +181,13 @@ main() {
                 if (condicionEliminar==0){
                 }else{
                     contadorTarea--;
+                    cout << contadorEliminado<< endl;
                     contadorEliminado++;
+                    cout << contadorEliminado<< endl;
                 }
+                
+                guardarTareasEnFichero(tareas, contadorTarea);
+                guardarTareasEliminadasFichero(tareaEliminada, contadorEliminado);
                 break;
             case 6:
                 historialTareas( tareas, tareaEliminada, contadorTarea, contadorEliminado, perfil);
@@ -378,12 +391,13 @@ int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int co
     //Fechas
     tareas[contadorTarea].anio = obtenerAnio();
     tareas[contadorTarea].mes = obtenerMes(tareas[contadorTarea].anio);
-    tareas[contadorTarea].dia = obtenerDia(tareas[contadorTarea].mes, tareas[contadorTarea].anio);      
+    tareas[contadorTarea].dia = obtenerDia(tareas[contadorTarea].mes, tareas[contadorTarea].anio);
+    tareas[contadorTarea].codigoTarea = crearCodigo(estudiante, tareas[contadorTarea].curso);    
+    tareas[contadorTarea].estado = "En proceso";    
 
     tareas[contadorTarea].estado = "En proceso";
 
-    contadorTarea++;
-    guardarTareasEnFichero(tareas, contadorTarea);
+    contadorTarea++;   
 
     for (i=0; i < contadorTarea; i++) {
         cout << endl << "Nombre de la tarea "<< i+1 << ": " << tareas[i].nombre << endl;
@@ -478,13 +492,13 @@ int crearNTareas(Estudiante &estudiante, Tarea tareas[100], Cursos materias[], i
     return contadorTarea;
 }
 
+
 void guardarTareasEnFichero(const Tarea tareas[], int contadorTarea)
 {
     ofstream fichero("tareas.txt");
     if (fichero.is_open())
     {
         fichero << contadorTarea << endl;
-
         for (int i = 0; i < contadorTarea; ++i)
         {
             fichero << tareas[i].nombre << endl;
@@ -496,6 +510,57 @@ void guardarTareasEnFichero(const Tarea tareas[], int contadorTarea)
             fichero << tareas[i].mes << endl;
             fichero << tareas[i].anio << endl;
             fichero << tareas[i].nota << endl;
+        }
+        fichero.close();
+    }
+}
+
+
+bool leerTareasEliminadasDesdeFichero(Tarea ta_eliminadas[], int &contadorEliminado)
+{
+    ifstream fichero("tareaselim.txt");
+    if (fichero.is_open())
+    {
+        fichero >> contadorEliminado;
+        fichero.ignore(); 
+
+        for (int i = 0; i < contadorEliminado; ++i)
+        {
+            getline(fichero, ta_eliminadas[i].nombre);
+            getline(fichero, ta_eliminadas[i].descripcion);
+            getline(fichero, ta_eliminadas[i].codigoTarea);
+            getline(fichero, ta_eliminadas[i].curso);
+            getline(fichero, ta_eliminadas[i].estado);
+            fichero >> ta_eliminadas[i].dia;
+            fichero >> ta_eliminadas[i].mes;
+            fichero >> ta_eliminadas[i].anio;
+            fichero >> ta_eliminadas[i].nota;
+            fichero.ignore(); 
+        }
+        fichero.close();
+        return true;
+    }
+    return false;
+}
+
+void guardarTareasEliminadasFichero(Tarea ta_eliminadas[], int contadorEliminado)
+{
+    ofstream fichero("tareaselim.txt");
+    if (fichero.is_open())
+    {
+        fichero << contadorEliminado << endl;
+
+        for (int i = 0; i < contadorEliminado; ++i)
+        {
+            fichero << ta_eliminadas[i].nombre << endl;
+            fichero << ta_eliminadas[i].descripcion << endl;
+            fichero << ta_eliminadas[i].codigoTarea << endl;
+            fichero << ta_eliminadas[i].curso << endl;
+            fichero << ta_eliminadas[i].estado << endl;
+            fichero << ta_eliminadas[i].dia << endl;
+            fichero << ta_eliminadas[i].mes << endl;
+            fichero << ta_eliminadas[i].anio << endl;
+            fichero << ta_eliminadas[i].nota << endl;
         }
         fichero.close();
     }
@@ -924,7 +989,6 @@ string obtenercodigo(){
 
 int indiceTarea(Tarea tareas[], int contadorTarea) {
     int i, opcion, tareaModificar, indiceTarea;
-    cout<<contadorTarea;
     cout << "\nEscoja la tarea donde se realizarán los cambios.\n"<<contadorTarea<<endl;
 
     for (i=0; i < contadorTarea; i++) {
@@ -1062,26 +1126,31 @@ bool validarcorreo(string correo){
 
 string crearCodigo(Estudiante &estudiante, string codigoMateria){
     string codigo;
+    bool codigoValido = false;
     Cursos materia;
 
     //Validar un código valido
     do{
         for(int i = 0; i < estudiante.numMateriasInscritas; i++){
-            if (estudiante.materias[i].codigo == codigoMateria){ 
+            if (estudiante.materias[i].codigo == codigoMateria){
+                codigoValido = true;
                 materia = estudiante.materias[i];
                 codigo = materia.codigo + to_string(materia.cantidad);
+
                 //Incrementar la cantidad de tareas de esa materia
                 estudiante.materias[i].cantidad++;
                 break;
             }
         }
+        if (!codigoValido){
             cout << "Ingrese un código valido, intente nuevamente: ";
             cin >> codigoMateria;
-    } while (true);
+        }
+    } while (!codigoValido);
 
 
     materia.cantidad ++;
-
+    
 
     return codigo;
 }
@@ -1244,6 +1313,7 @@ int eliminarTarea(Tarea tarea[],Tarea TareaEliminada[], int contadorTarea, int c
     
         system("PAUSE");
     }
+
     //En el main hay una condición para que se sume uno al contador eliminado y reste uno al contador de tareas, y este es el valor de condicionEliminar, y para esto lo retornamos
     return condicionEliminar;
 }
@@ -1317,14 +1387,18 @@ void historialTareas(Tarea tarea[],Tarea TareaEliminada[],int contadorTarea,int 
         //Validación del código de la materia
         do{
             cin>>buscador;
+            int j;
             for (int i=0; i<estudiante.numMateriasInscritas;i++){
                 if (buscador==estudiante.materias[i].codigo){
+                    j=1;
                     break;
                 }
             }
+            if (j==1){
+                break;
+            }
             cout<<endl<<"El código que ingreso no pertenece a ninguna materia."<<endl<<"Ingrese nuevamente el código de la materia: ";
         }while (true);
-
         cout<<endl<<endl;
         //Impresión: historial total de la <materia> 
         for (int i=0;i<estudiante.numMateriasInscritas;i++){
