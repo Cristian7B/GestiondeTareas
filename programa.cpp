@@ -9,10 +9,11 @@ Fecha: 5 de Junio
 #include <locale.h>
 #include <string>
 #include <iomanip>
-#include <cctype>
+#include <fstream>
 
 using namespace std;
 
+//REGISTROS 
 
 //Nombre de los cursos del estudiante
 struct Cursos {
@@ -25,7 +26,7 @@ struct Cursos {
 //Crear estudiante
 struct Estudiante {
     string nombre;
-    int codigo;
+    string codigo;
     string apellido;
     string correo;
     Cursos materias[15];
@@ -46,56 +47,91 @@ struct Tarea {
     Cursos materia;
 };
 
-// Prototipado de funciones
+//PROTOTIPADO DE LAS FUNCIONES DEL PROGRAMA
+
 void registrarEstudiante(Estudiante &estudiante);
 void registrarMaterias(Estudiante &estudiante); 
 
+// Funciones para los ficheros
+
+bool leerEstudianteDesdeFichero(Estudiante &estudiante);
+void guardarEstudianteEnFichero(Estudiante &estudiante);
+bool leerTareasDesdeFichero(Tarea tareas[], int &contadorTarea);
+void guardarTareasEnFichero(const Tarea tareas[], int contadorTarea);
+void guardarTareasEliminadasFichero(Tarea ta_eliminadas[], int contadorEliminado);
+bool leerTareasEliminadasDesdeFichero(Tarea tareas_eliminadas[], int &contadorEliminado);
+
 // Funciones de las tareas
-int crearTarea(Estudiante &estudiante, Tarea tareas[], int contadorTarea);
-int crearNTareas(Estudiante &estudiante, Tarea tareas[], int contadorTarea);
+int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea);
+int crearNTareas(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea);
+int eliminarTarea(Tarea tarea[],Tarea TareaEliminada[], int contadorTarea, int contadorEliminado);
 void modificarTarea(Tarea tareas[], int contadorTarea);
 void cambiarEstadoTarea(Tarea tareas[], int contadorTarea);
-void eliminarTarea(Tarea &tarea, int contadorTarea);
 void estadoTarea(Tarea &tarea);
 void buscarFechaTarea(Tarea tareas[], int contadorTarea);
 
 // Consultas
 void tareasMateria(Tarea &tarea);
 void tareasFecha(Tarea &tarea);
+void historialTareas(Tarea tarea[],Tarea TareaEliminada[],int contadorTarea,int contadorEliminado, Estudiante &estudiante);
 
 // Funciones adicionales
-int obtenercodigo();
+string obtenercodigo();
 int obtenerAnio();
 int indiceTarea(Tarea tareas[], int contadorTarea);
 int indiceTareaEstado(Tarea tareas[], int contadorTarea);
 int obtenerMes(int anio);
 int obtenerDia(int mes, int anio);
 bool validarcorreo(string correo);
-
+bool validarNombre(string nombre);
 string crearCodigo(Estudiante &estudiante, string cursoNombre);
 string obtenerCorreo();
 string obtenerNombre(string aPedir);
-bool validarNombre(string nombre);
 
 
 main() { 
     //Vectorizacion de los struct
-    Tarea tareas[100];
+    Tarea tareas[100], tareaEliminada[100];
+    Cursos materias[15];
     Estudiante perfil;
 
     setlocale(LC_ALL, "spanish");
     system("cls");
-    
-    //Variales globales
-    int decision = 0, contadorMateria = 0, opcion = 0, contadorTarea = 0;
 
+    //Variales globales
+    int decision = 0, contadorMateria = 0, opcion = 0, contadorTarea = 0, contadorEliminado=0, condicionEliminar=0;
     cout << "¡Bienvenido a tu sistema de gestion de tareas personal!\n";
 
     system("PAUSE");
     system("CLS");
 
-    cout << "Es hora de registrar tu perfil.\n";
-    registrarEstudiante(perfil);
+    if (!leerEstudianteDesdeFichero(perfil))
+    {
+        cout << "Es hora de registrar tu perfil.\n";
+        registrarEstudiante(perfil);
+        guardarEstudianteEnFichero(perfil);
+    }
+
+    else
+    {
+        cout << "Perfil cargado exitosamente.\n";
+        cout << "Bienvenido " << perfil.nombre << ".\n";
+        system("PAUSE");
+    }
+
+    if (leerTareasDesdeFichero(tareas, contadorTarea))
+    {
+        system("CLS");
+        cout << contadorTarea << " Tareas han sido cargadas exitosamente.\n";
+        system("PAUSE");
+    }
+
+    if (leerTareasEliminadasDesdeFichero(tareaEliminada, contadorEliminado)) {
+        system("CLS");
+        cout << contadorEliminado << " Tareas han sido cargadas exitosamente.\n";
+        system("PAUSE");
+    }
+
 
     // Menú de opciones
     while (decision == 0) {
@@ -119,27 +155,42 @@ main() {
 
         switch (opcion) {
             case 1:
-                contadorTarea = crearTarea(perfil, tareas, contadorTarea);
+                contadorTarea = crearTarea(perfil, tareas, materias, contadorTarea);
                 system("pause");
+                guardarTareasEnFichero(tareas, contadorTarea);
                 break;
 
             case 2:
-                contadorTarea = crearNTareas(perfil, tareas, contadorTarea);
+                contadorTarea = crearNTareas(perfil, tareas, materias, contadorTarea);
                 system("pause");
+                guardarTareasEnFichero(tareas, contadorTarea);
                 break;
 
             case 3:
                 modificarTarea(tareas, contadorTarea);
+                guardarTareasEnFichero(tareas, contadorTarea);
                 break;
 
             case 4:
                 cambiarEstadoTarea(tareas, contadorTarea);
+                guardarTareasEnFichero(tareas, contadorTarea);
                 break;
 
             case 5:
+                condicionEliminar=eliminarTarea( tareas, tareaEliminada,  contadorTarea,  contadorEliminado);
+                if (condicionEliminar==0){
+                }else{
+                    contadorTarea--;
+                    cout << contadorEliminado<< endl;
+                    contadorEliminado++;
+                    cout << contadorEliminado<< endl;
+                }
+                
+                guardarTareasEnFichero(tareas, contadorTarea);
+                guardarTareasEliminadasFichero(tareaEliminada, contadorEliminado);
                 break;
-
             case 6:
+                historialTareas( tareas, tareaEliminada, contadorTarea, contadorEliminado, perfil);
                 break;
 
             case 7:
@@ -169,7 +220,7 @@ void registrarEstudiante(Estudiante &estudiante) {
     estudiante.apellido = obtenerNombre("apellido");
 
     estudiante.correo = obtenerCorreo();
-  
+
     estudiante.codigo = obtenercodigo();
 
     registrarMaterias(estudiante);
@@ -178,7 +229,7 @@ void registrarEstudiante(Estudiante &estudiante) {
 void registrarMaterias(Estudiante &estudiante) { 
     string continuar;
     int numMateriasRegistradas = 0;
-    int contadorMat;
+    bool materiaValida = true;
 
     cout << "\nMaterias.\n";
     cout << "--------------------";
@@ -191,34 +242,30 @@ void registrarMaterias(Estudiante &estudiante) {
 
         cout << "\nIngresa el nombre de la materia: ";
         do{
-            contadorMat=0;
             getline(cin, estudiante.materias[numMateriasRegistradas].nombre);
-            if (numMateriasRegistradas==0){
-            }else{
-                for (int i=0;i<numMateriasRegistradas;i++){
-                    if ( estudiante.materias[i].nombre == estudiante.materias[numMateriasRegistradas].nombre){
+            if (numMateriasRegistradas != 0){
+                for (int i=0; i<numMateriasRegistradas; i++){
+                    if (estudiante.materias[i].nombre == estudiante.materias[numMateriasRegistradas].nombre){
                         cout << "Dos materias no pueden llamarse igual, ingrese un nuevo nombre: ";
-                        contadorMat++;
+                        materiaValida = false;
                     }               
                 }
             }
-        }while (contadorMat!=0);
-        
+        }while (!materiaValida);
+
 
         cout << "\tAhora registra el código de la materia: ";
         do{
-            contadorMat=0;
             getline(cin, estudiante.materias[numMateriasRegistradas].codigo);
-            if (numMateriasRegistradas==0){
-            }else{
-                for (int i=0;i<numMateriasRegistradas;i++){
+            if (numMateriasRegistradas !=0){
+                for (int i=0; i<numMateriasRegistradas; i++){
                     if ( estudiante.materias[i].codigo == estudiante.materias[numMateriasRegistradas].codigo){
                         cout << "Dos materias no pueden tener el mismo código, ingrese uno nuevo: ";
-                        contadorMat++;
+                        materiaValida = false;
                     }               
                 }
             }
-        }while (contadorMat!=0);
+        }while (!materiaValida);
 
         cout << "\nLa materia se registró como " << estudiante.materias[numMateriasRegistradas].nombre << endl;
         cout << "El código de " << estudiante.materias[numMateriasRegistradas].nombre << " es " << estudiante.materias[numMateriasRegistradas].codigo;
@@ -245,8 +292,57 @@ void registrarMaterias(Estudiante &estudiante) {
     estudiante.numMateriasInscritas += numMateriasRegistradas;
 }
 
+bool leerEstudianteDesdeFichero(Estudiante &estudiante)
+{
+    ifstream fichero("estudiante.txt");
+    if (fichero.is_open())
+    {
+        getline(fichero, estudiante.nombre);
+        getline(fichero, estudiante.apellido);
+        getline(fichero, estudiante.correo);
+        fichero >> estudiante.codigo;
+        fichero >> estudiante.numMateriasInscritas;
+        fichero.ignore(); 
 
-int crearTarea(Estudiante &estudiante, Tarea tareas[], int contadorTarea){
+        for (int i = 0; i < estudiante.numMateriasInscritas; ++i)
+        {
+            getline(fichero, estudiante.materias[i].nombre);
+            getline(fichero, estudiante.materias[i].codigo);
+            fichero >> estudiante.materias[i].cantidad;
+            fichero >> estudiante.materias[i].cantidadMaterias;
+            fichero.ignore(); 
+        }
+        fichero.close();
+        return true;
+    }
+    return false;
+}
+
+void guardarEstudianteEnFichero(Estudiante &estudiante)
+{
+    ofstream fichero("estudiante.txt");
+    if (fichero.is_open())
+    {
+        fichero << estudiante.nombre << endl;
+        fichero << estudiante.apellido << endl;
+        fichero << estudiante.correo << endl;
+        fichero << estudiante.codigo << endl;
+        fichero << estudiante.numMateriasInscritas << endl;
+
+        for (int i = 0; i < estudiante.numMateriasInscritas; ++i)
+        {
+            fichero << estudiante.materias[i].nombre << endl;
+            fichero << estudiante.materias[i].codigo << endl;
+            fichero << estudiante.materias[i].cantidad << endl;
+            fichero << estudiante.materias[i].cantidadMaterias << endl;
+        }
+        fichero.close();
+    }
+}
+
+
+
+int crearTarea(Estudiante &estudiante, Tarea tareas[], Cursos materias[], int contadorTarea){
     system("CLS");
     int i;
 
@@ -256,7 +352,7 @@ int crearTarea(Estudiante &estudiante, Tarea tareas[], int contadorTarea){
 
     cout << "Ingresa el nombre de la tarea: ";
     getline(cin, tareas[contadorTarea].nombre);
-    
+
     cout << "Ingresa la descripción de la tarea: ";
     getline(cin, tareas[contadorTarea].descripcion);
 
@@ -287,8 +383,8 @@ int crearTarea(Estudiante &estudiante, Tarea tareas[], int contadorTarea){
         cout << "El código que ingreso no pertenece a ninguna materia, ingrese de nuevo el código: ";
     }while (true);
 
-    
-    
+
+
     cout << "\nFecha de entrega de la tarea.\n";
     cout << "--------------------\n";
 
@@ -297,11 +393,11 @@ int crearTarea(Estudiante &estudiante, Tarea tareas[], int contadorTarea){
     tareas[contadorTarea].mes = obtenerMes(tareas[contadorTarea].anio);
     tareas[contadorTarea].dia = obtenerDia(tareas[contadorTarea].mes, tareas[contadorTarea].anio);
     tareas[contadorTarea].codigoTarea = crearCodigo(estudiante, tareas[contadorTarea].curso);    
+    tareas[contadorTarea].estado = "En proceso";    
 
-    
     tareas[contadorTarea].estado = "En proceso";
 
-    contadorTarea++;
+    contadorTarea++;   
 
     for (i=0; i < contadorTarea; i++) {
         cout << endl << "Nombre de la tarea "<< i+1 << ": " << tareas[i].nombre << endl;
@@ -311,22 +407,73 @@ int crearTarea(Estudiante &estudiante, Tarea tareas[], int contadorTarea){
         cout << "Codigo: " << tareas[i].codigoTarea << endl;
         cout << "Año de entrega: " << tareas[i].anio << endl;
         cout << "Mes de entrega: " << tareas[i].mes << endl;
-        cout << "Día de entrega: " << tareas[i].dia << endl;
+        cout << "Dia de entrega: " <<tareas[i].dia << endl;
         cout << endl;
     }
 
     return contadorTarea;
 }
 
-int crearNTareas(Estudiante &estudiante, Tarea tareas[100], int contadorTarea){
-    
+int crearNTareas(Estudiante &estudiante, Tarea tareas[100], Cursos materias[], int contadorTarea){
+    int i = 0;
+
     string repeticion = "s";
 
     while(repeticion == "s" && contadorTarea < 100) {
         system("CLS");
+        cout << "Tarea " << contadorTarea+1 << endl;
+        cout << "--------------------\n";
+        cin.ignore();
 
-        contadorTarea = crearTarea(estudiante, tareas, contadorTarea);
-        
+        cout << "Ingresa el nombre de la tarea: ";
+        getline(cin, tareas[contadorTarea].nombre);
+
+        cout << "Ingresa la descripción de la tarea: ";
+        getline(cin, tareas[contadorTarea].descripcion);
+
+        cout << "Ingrese el codigo del curso al que pertenece la materia, las materias son: \n";
+        cout << endl;
+
+        cout << left << setw(20) << "Materia" << setw(10) << "Codigo" << endl;
+        for(i = 0; i < estudiante.numMateriasInscritas ; i++) {
+            cout << setw(20) << left << estudiante.materias[i].nombre << setw(10) << left << estudiante.materias[i].codigo << endl;
+        }
+
+        cout << endl << "Ingrese código: ";
+
+        int cantmaterias=i;
+
+        do{ //Validación del ingreso del codigo del curso en la tarea
+            int numTarea=0;
+            getline(cin, tareas[contadorTarea].curso);
+            for (int i=0;i<cantmaterias;i++){
+                if ( tareas[contadorTarea].curso==estudiante.materias[i].codigo){
+                    numTarea++;
+                    break;
+                }
+            }
+            if (numTarea!=0){
+                break;
+            }
+            cout << "El código que ingreso no pertenece a ninguna materia, ingrese de nuevo el código: ";
+        }while (true);
+
+
+
+
+
+        cout << "\nFecha de entrega de la tarea.\n";
+        cout << "--------------------\n";
+
+        //Fechas
+        tareas[contadorTarea].anio = obtenerAnio();
+        tareas[contadorTarea].mes = obtenerMes(tareas[contadorTarea].anio);
+        tareas[contadorTarea].dia = obtenerDia(tareas[contadorTarea].mes, tareas[contadorTarea].anio);
+        tareas[contadorTarea].codigoTarea = crearCodigo(estudiante, tareas[contadorTarea].curso);    
+        tareas[contadorTarea].estado = "En proceso";
+
+        contadorTarea++;
+
         cout << "¿Desea agregar otra tarea? s/n: ";
         cin >> repeticion;
     }
@@ -344,6 +491,107 @@ int crearNTareas(Estudiante &estudiante, Tarea tareas[100], int contadorTarea){
     }
 
     return contadorTarea;
+}
+
+
+void guardarTareasEnFichero(const Tarea tareas[], int contadorTarea)
+{
+    ofstream fichero("tareas.txt");
+    if (fichero.is_open())
+    {
+        fichero << contadorTarea << endl;
+        for (int i = 0; i < contadorTarea; ++i)
+        {
+            fichero << tareas[i].nombre << endl;
+            fichero << tareas[i].descripcion << endl;
+            fichero << tareas[i].codigoTarea << endl;
+            fichero << tareas[i].curso << endl;
+            fichero << tareas[i].estado << endl;
+            fichero << tareas[i].dia << endl;
+            fichero << tareas[i].mes << endl;
+            fichero << tareas[i].anio << endl;
+            fichero << tareas[i].nota << endl;
+        }
+        fichero.close();
+    }
+}
+
+
+bool leerTareasEliminadasDesdeFichero(Tarea ta_eliminadas[], int &contadorEliminado)
+{
+    ifstream fichero("tareaselim.txt");
+    if (fichero.is_open())
+    {
+        fichero >> contadorEliminado;
+        fichero.ignore(); 
+
+        for (int i = 0; i < contadorEliminado; ++i)
+        {
+            getline(fichero, ta_eliminadas[i].nombre);
+            getline(fichero, ta_eliminadas[i].descripcion);
+            getline(fichero, ta_eliminadas[i].codigoTarea);
+            getline(fichero, ta_eliminadas[i].curso);
+            getline(fichero, ta_eliminadas[i].estado);
+            fichero >> ta_eliminadas[i].dia;
+            fichero >> ta_eliminadas[i].mes;
+            fichero >> ta_eliminadas[i].anio;
+            fichero >> ta_eliminadas[i].nota;
+            fichero.ignore(); 
+        }
+        fichero.close();
+        return true;
+    }
+    return false;
+}
+
+void guardarTareasEliminadasFichero(Tarea ta_eliminadas[], int contadorEliminado)
+{
+    ofstream fichero("tareaselim.txt");
+    if (fichero.is_open())
+    {
+        fichero << contadorEliminado << endl;
+
+        for (int i = 0; i < contadorEliminado; ++i)
+        {
+            fichero << ta_eliminadas[i].nombre << endl;
+            fichero << ta_eliminadas[i].descripcion << endl;
+            fichero << ta_eliminadas[i].codigoTarea << endl;
+            fichero << ta_eliminadas[i].curso << endl;
+            fichero << ta_eliminadas[i].estado << endl;
+            fichero << ta_eliminadas[i].dia << endl;
+            fichero << ta_eliminadas[i].mes << endl;
+            fichero << ta_eliminadas[i].anio << endl;
+            fichero << ta_eliminadas[i].nota << endl;
+        }
+        fichero.close();
+    }
+}
+
+bool leerTareasDesdeFichero(Tarea tareas[], int &contadorTarea)
+{
+    ifstream fichero("tareas.txt");
+    if (fichero.is_open())
+    {
+        fichero >> contadorTarea;
+        fichero.ignore(); 
+
+        for (int i = 0; i < contadorTarea; ++i)
+        {
+            getline(fichero, tareas[i].nombre);
+            getline(fichero, tareas[i].descripcion);
+            getline(fichero, tareas[i].codigoTarea);
+            getline(fichero, tareas[i].curso);
+            getline(fichero, tareas[i].estado);
+            fichero >> tareas[i].dia;
+            fichero >> tareas[i].mes;
+            fichero >> tareas[i].anio;
+            fichero >> tareas[i].nota;
+            fichero.ignore(); 
+        }
+        fichero.close();
+        return true;
+    }
+    return false;
 }
 
 void modificarTarea(Tarea tareas[], int contadorTarea) {
@@ -384,7 +632,7 @@ void modificarTarea(Tarea tareas[], int contadorTarea) {
                     system("CLS");
                     cout << "Ingrese el nuevo nombre de la tarea " << tareas[indice].nombre << ": ";
                     cin.ignore();
-                    
+
                     getline(cin, tareas[indice].nombre);
                     break;
 
@@ -421,7 +669,7 @@ void modificarTarea(Tarea tareas[], int contadorTarea) {
                     case 3:
                         tareas[indice].dia = obtenerDia(tareas[indice].mes, tareas[indice].anio);
                         break;
-                    
+
                     case 4:
                         tareas[indice].anio = obtenerAnio();
                         tareas[indice].mes = obtenerMes(tareas[indice].anio);
@@ -450,7 +698,7 @@ void modificarTarea(Tarea tareas[], int contadorTarea) {
 
                     cout << "Ingrese el nuevo nombre de la tarea " << tareas[indice].nombre << ": ";
                     cin.ignore();
-                    
+
                     getline(cin, tareas[indice].nombre);
 
                     system("CLS");
@@ -485,7 +733,7 @@ void modificarTarea(Tarea tareas[], int contadorTarea) {
                     case 3:
                         tareas[indice].dia = obtenerDia(tareas[indice].mes, tareas[indice].anio);
                         break;
-                    
+
                     case 4:
                         tareas[indice].anio = obtenerAnio();
                         tareas[indice].mes = obtenerMes(tareas[indice].anio);
@@ -502,7 +750,7 @@ void modificarTarea(Tarea tareas[], int contadorTarea) {
                     cout << "Ingrese la nueva descripción de la tarea " << tareas[indice].nombre << "." << endl;
                     cout << "La descripción actual es " << tareas[indice].descripcion << "." << endl;
                     cin.ignore();
-                    
+
                     getline(cin, tareas[indice].descripcion);
                     break;
 
@@ -511,7 +759,7 @@ void modificarTarea(Tarea tareas[], int contadorTarea) {
                     cout << "--------------------\n";
                     indiceTarea(tareas, contadorTarea);
                     break;
-                
+
                 case 6:
                     decision = 1;
                     break;
@@ -571,7 +819,7 @@ void buscarFechaTarea(Tarea tareas[], int contadorTarea) {
                         cout << endl;
                         tareasCoinciden++;
                     }
-                    
+
                 }
             }
         }
@@ -583,7 +831,7 @@ void buscarFechaTarea(Tarea tareas[], int contadorTarea) {
         cout << "¿Desea buscar otra tarea? s/n: ";
         cin >> repeticion;
         cout << endl;
-        
+
     }
 }
 
@@ -595,7 +843,7 @@ void cambiarEstadoTarea(Tarea tareas[], int contadorTarea) {
     system("CLS");
 
     if (contadorTarea > 0) {
-        
+
         cout << "Modificar el estado de una tarea.\n";
         cout << "--------------------\n";
 
@@ -604,7 +852,7 @@ void cambiarEstadoTarea(Tarea tareas[], int contadorTarea) {
         if (indice < 0) {
             decision = 1;
         }
-        
+
 
         while (decision == 0)
         {
@@ -625,7 +873,7 @@ void cambiarEstadoTarea(Tarea tareas[], int contadorTarea) {
                 cout << "\nIngrese una opcion correcta: ";
                 cin >> opcion;
             }
-            
+
 
             switch (opcion)
             {
@@ -633,8 +881,8 @@ void cambiarEstadoTarea(Tarea tareas[], int contadorTarea) {
                 system("CLS");
                 cout << "¿Ha entregado la tarea " << "'" << tareas[indice].nombre << "'" << "?: ";
                 cin >> estado;
-                
-                
+
+
                 caracteres = estado.length();
 
                 for (i = 0; i < caracteres; i++) {
@@ -675,18 +923,18 @@ void cambiarEstadoTarea(Tarea tareas[], int contadorTarea) {
                 }
 
                 decision = 1;
-                
+
                 system("PAUSE");
                 break;
-            
+
             case 2:
                 indice = indiceTareaEstado(tareas, contadorTarea) - 1;
                 break;
-            
+
             case 3:
                 decision = 1;
                 break;
-            
+
             default:
                 break;
             }
@@ -697,7 +945,7 @@ void cambiarEstadoTarea(Tarea tareas[], int contadorTarea) {
         cout << "Primero debe ingresar alguna tarea.\n";
         system("PAUSE");
     }
-    
+
 }
 
 
@@ -718,26 +966,31 @@ string obtenerNombre(string aPedir){
 }
 
 
-int obtenercodigo(){
-    float codigo;
-    
-    cout << "Ingrese el código de estudiante: ";
-    cin >> codigo;
+string obtenercodigo(){
+    string codigo;
+    bool soloNumeros = true;
 
-    while(cin.fail() || codigo < 0){
-        cin.clear();
-        cin.ignore();
-        cout << "Ingrese solamente valores númericos: ";
+    cout << "Ingrese el código de estudiante (solo recibe números enteros): ";
+    do{
         cin >> codigo;
-    }
+        //Verificar que se hayan ingresado digitos
+        for (int i = 0; i < codigo.length(); i++){
+            if(!isdigit(codigo[i])){
+                cout << "Solamente recibe codigos como números naturales, ingrese nuevamente el código: ";
+                soloNumeros = false;
+                break;
+            }else{
+                soloNumeros = true;
+            }
+        }
+    }while(!soloNumeros);
 
-    return float(codigo);
+    return codigo;
 }
 
 int indiceTarea(Tarea tareas[], int contadorTarea) {
     int i, opcion, tareaModificar, indiceTarea;
-
-    cout << "\nEscoja la tarea donde se realizarán los cambios.\n";
+    cout << "\nEscoja la tarea donde se realizarán los cambios.\n"<<contadorTarea<<endl;
 
     for (i=0; i < contadorTarea; i++) {
         cout << endl << i+1 << ". " << tareas[i].nombre << endl;
@@ -793,9 +1046,9 @@ int indiceTareaEstado(Tarea tareas[], int contadorTarea) {
                     {
                         tareasSinModificar++;
                     }
-                    
+
                 }
-                
+
 
                 if ( tareasSinModificar == 0) {
                     cout << "Agregue otra tarea para realizar cambios en el estado.\n";
@@ -808,68 +1061,68 @@ int indiceTareaEstado(Tarea tareas[], int contadorTarea) {
     } while (tareas[tareaModificar-1].estado != "En proceso");
 
     return tareaModificar;
-        
+
 }
 
 string obtenerCorreo (){
-	string correo;
-	int contador=0;
-	do{
-		if (contador==0){
-			cout<<"Ingrese correo: ";
-		    getline(cin, correo);
-		}else{
-			cout<<"El correo no es válido, vuelva a ingresar el correo: ";
-		    getline(cin, correo);
-		}
-		contador++;
-	}while (!validarcorreo(correo));
-	return correo;
+  string correo;
+  int contador=0;
+  do{
+    if (contador==0){
+      cout<<"Ingrese correo: ";
+        getline(cin, correo);
+    }else{
+      cout<<"El correo no es válido, vuelva a ingresar el correo: ";
+        getline(cin, correo);
+    }
+    contador++;
+  }while (!validarcorreo(correo));
+  return correo;
 }
 
 bool validarcorreo(string correo){
     string arroba="@";
-	string punto=".";
-	string espacio=" ";
-	bool var=false;
-	int condicion,cantidad=100;
+  string punto=".";
+  string espacio=" ";
+  bool var=false;
+  int condicion,cantidad=100;
 
     int cantletras=correo.length();
     for (int i=0;i<cantletras;i++){
-    	if (correo[i]==espacio[0]){
-    		condicion=1;
-    		break;
-		}else{
-			condicion=0;
-		}
-	}
-	if (condicion == 0){
+      if (correo[i]==espacio[0]){
+        condicion=1;
+        break;
+    }else{
+      condicion=0;
+    }
+  }
+  if (condicion == 0){
         for (int i = 0; i < cantletras; i++){
             if (correo[i] == arroba[0]){
-            	if (i==0){		//Arroba no puede ser inicio del correo
-            		break;
-				}else{
-	                for (int j = i; j < cantletras; j++){	//El for empieza a contar desde la posicion del arroba hasta encontrar un punto
-	                    if (correo[j] == punto[0]){
+              if (i==0){		//Arroba no puede ser inicio del correo
+                break;
+        }else{
+                  for (int j = i; j < cantletras; j++){	//El for empieza a contar desde la posicion del arroba hasta encontrar un punto
+                      if (correo[j] == punto[0]){
 
-	                    	if (j-i<=1){	//El arroba y el punto no pueden ir seguidos
-	                    		break;
-							}else{
-								if (cantletras-1!=j){
-									var=true;
-	                    			break;
-								}
+                        if (j-i<=1){	//El arroba y el punto no pueden ir seguidos
+                          break;
+              }else{
+                if (cantletras-1!=j){
+                  var=true;
+                            break;
+                }
 
-							}
+              }
 
-	                    }
-	                }
-	            }
+                      }
+                  }
+              }
             }
         }
     }else{
-	}
-	return var;    
+  }
+  return var;    
 }
 
 string crearCodigo(Estudiante &estudiante, string codigoMateria){
@@ -914,7 +1167,7 @@ int obtenerAnio(){
     //Preguntar si la fecha de entrega es este año
     cout << "¿La tarea se entrega este año? s/n: ";
     cin >> respuesta;
-    
+
     while(respuesta != "s" && respuesta != "n"){
         cout << "Digite 's' o 'n', ningún otro valor: ";
         cin >> respuesta;
@@ -970,24 +1223,23 @@ int obtenerDia(int mes, int anio){
     int dia, ultimoDiaDelMes;
 
     //Obtener último día del mes
-    switch (mes){
-            case 2:
-                //Revisar si es bisiesto
-                if (anio % 4 == 0){
-                    ultimoDiaDelMes= 29;
-                }else{
-                    ultimoDiaDelMes= 28;
-                }
-                break;
-            case 4:
-            case 6:
-            case 9:
-            case 11:
-                ultimoDiaDelMes= 30;
-            default:
-                ultimoDiaDelMes= 31;
-                break;
-        }
+    switch(mes){
+        case 1 || 3 || 5 || 7 || 8 || 10 || 12:
+            ultimoDiaDelMes = 31;
+
+            break;
+        case 2:
+            //Revisar si el año es bisiesto
+            if (anio % 4 == 0){
+                ultimoDiaDelMes = 29;
+            }else{
+                ultimoDiaDelMes = 28;
+            }
+
+            break;
+        default:
+            ultimoDiaDelMes = 30;
+    }
 
     cout << "\nIngrese el día de entrega: ";
     cin >> dia;
@@ -1012,4 +1264,184 @@ bool validarNombre(string nombre){
     }
 
     return nombreValido;
+}
+
+int eliminarTarea(Tarea tarea[],Tarea TareaEliminada[], int contadorTarea, int contadorEliminado){
+    int numTarea, condicionEliminar;
+    system("CLS");
+    if (contadorTarea==0){  //Condicion si no existen tareas para borrar
+        cout << "No tiene ninguna tarea actualmente\n ";
+        system("PAUSE");
+        condicionEliminar=0;
+    }else{  //Condición si existen tareas para borrar
+        cout<<"Las tareas creadas anteriormente son: "<< endl << endl;
+        for (int i=0; i<contadorTarea;i++){     //Impresión del número de la tarea con la tarea. Ejemplo: Tarea 1: cartelera
+            if (tarea[i].nombre!=""){
+                cout << "       Tarea " << i+1 <<": " << tarea[i].nombre<<endl;   
+            }
+        }
+        cout<<"\nIngrese el número de la tarea que deséa eliminar: ";
+        do{     //Validación en caso de que el usuario un número de una tarea que no exista o ingrese letras
+            cin >> numTarea;
+            if (cin.fail()){
+                cin.clear();
+                cin.ignore(200, '\n');
+            }else{}
+            if ( numTarea<=contadorTarea && numTarea>0 ){
+                break;
+            }
+            cout << "La tarea que ingresaste es inválida o no existe.\nVuelva a ingresar el número de la tarea: ";
+        }while (true);
+
+        numTarea--; //Restamos 1 al número de la tarea para convertirlo en el índice de tarea[i] 
+
+        //Impresión de la tarea eliminada
+        cout << "\nLa tarea que eliminaste es: "<< endl;
+        cout << endl << "       Tarea " << numTarea+1 << ": " << tarea[numTarea].nombre;
+
+        TareaEliminada[contadorEliminado]=tarea[numTarea];  //Asignamos un nuevo vector donde en un futuro se establecerán todas las tareas eliminadas
+
+        for (int i = numTarea; i < contadorTarea ; i++) {   //for para que desde la tarea que se elimine todas las tareas se corran un puesto para atras
+            if (i==contadorTarea-1){
+            }else{
+                tarea[i] = tarea[i + 1];
+            }
+        }   
+
+        //Ejemplo de la asignación al final del for: se elimina tarea 3. Entonces la tarea 4 pasará a ser 3, la tarea 5 pasará a la 4 y asi sucesivamente
+        //En el último ciclo del for, el bucle no hará nada, para que se deje la última tarea quieta, hasta acá la tarea n y la tarea n-1 serán iguales
+
+        condicionEliminar=1;
+        //Finalmente en el main() se declará que el contador eliminado(contador que cuenta cuantas tareas se han eliminado) aumenta uno, y el contador de las tareas disminuye en uno
+    
+        system("PAUSE");
+    }
+
+    //En el main hay una condición para que se sume uno al contador eliminado y reste uno al contador de tareas, y este es el valor de condicionEliminar, y para esto lo retornamos
+    return condicionEliminar;
+}
+
+void historialTareas(Tarea tarea[],Tarea TareaEliminada[],int contadorTarea,int contadorEliminado, Estudiante &estudiante){
+
+    //Para esta función es importante tener en cuenta que anteriormente ya habíamos validado que el ingreso del código del curso en una tarea, concuerde con algún curso.
+
+    system("CLS");
+    string buscador;    //Se declara buscador, porque ahorita se le pedirá al usuario que materia quiere ver el historial, preguntandole el código de la materia
+    int numTarea=0, contadorTareasEliminadas=0, contadorTareasActuales=0;
+    if (contadorTarea==0 && contadorEliminado==0){  //Condición si no existe ninguna tarea, ni ninguna tarea eliminada
+        cout << "No ha ingresado ninguna tarea. Por lo tanto no tiene ningún historial.\n\n";
+        system("PAUSE");
+    }else if(contadorTarea==0 && contadorEliminado!=0){ //Condición si no existe ninguna tarea, pero si has eliminado tareas
+        cout<< "No tienes ninguna tarea actualmente, sin embargo, puedes buscar que tareas has eliminado en las siguientes materias: ";
+        cout<<endl<<endl;
+        cout << left << setw(20) << "Materia" << setw(10) << "Código" << endl;
+
+        for(int i = 0; i < estudiante.numMateriasInscritas ; i++) {	//impresión de nombre y código de materia
+            cout << setw(20) << left << estudiante.materias[i].nombre << setw(10) << left << estudiante.materias[i].codigo << endl;
+        }
+
+        //Ingreso del código de la materia por el usuario
+        cout<< "\n\nIngrese el código de la materia al cual deséas saber que tareas has eliminado: " ;
+
+        //Validación del ingreso para que concuerde el código que ingresa el usuario y los códigos que tienen las materias
+        do{
+            cin>>buscador;
+            int j;
+            for (int i=0; i<estudiante.numMateriasInscritas;i++){
+                if (buscador==estudiante.materias[i].codigo){
+                    j=1;
+                    break;
+                }
+            }
+            if (j==1){
+                break;
+            }
+            cout<<endl<<"El código que ingreso no pertenece a ninguna materia."<<endl<<"Ingrese nuevamente el código de la materia: ";
+        }while (true);
+
+        numTarea=0; //contador para imprimir el número de la tarea, es decir tarea 1 y asi sucesivamente.
+        cout<< endl<<endl<<"Tareas eliminadas: \n\n";
+
+        //Se hace un for para que pase por todas las tareas eliminadas
+        for (int i=0;i<contadorEliminado;i++){
+            if (buscador==TareaEliminada[i].curso){ //Condición en caso de que el buscador sea igual al código de curso que le asignamos al crear la tarea
+                numTarea++;
+                cout<<"Tarea "<<numTarea<<": "<< TareaEliminada[i].nombre<<endl;
+                contadorTareasEliminadas++;
+            }  
+        }
+        //Si ningún caso en el for cumplirá la condición no se imprimira nada
+        cout<<endl<<endl;
+        //Condicion en caso de que en la materia ingresada no se haya eliminado ninguna tarea
+        if (contadorTareasEliminadas==0){
+            cout<<"No has eliminado ninguna tarea en esta materia.\n\n";
+        }
+        system("PAUSE");
+    }else{  //El código de esta condición tiene una lógica muy similar a la de la condición anterior
+        
+        cout<< "Las materias con su código respectivamente son: "<<endl<<endl;
+        cout << left << setw(20) << "Materia" << setw(10) << "Código" << endl;
+        for(int i = 0; i < estudiante.numMateriasInscritas ; i++) {	//impresión de nombre y código de materia
+            cout << setw(20) << left << estudiante.materias[i].nombre << setw(10) << left << estudiante.materias[i].codigo << endl;
+        }
+
+        //Ingreso de código de la materia
+        cout<< "\n\nIngrese el código de la materia al cual desea saber que tareas tienes actualmente: " ;
+        //Validación del código de la materia
+        do{
+            cin>>buscador;
+            int j;
+            for (int i=0; i<estudiante.numMateriasInscritas;i++){
+                if (buscador==estudiante.materias[i].codigo){
+                    j=1;
+                    break;
+                }
+            }
+            if (j==1){
+                break;
+            }
+            cout<<endl<<"El código que ingreso no pertenece a ninguna materia."<<endl<<"Ingrese nuevamente el código de la materia: ";
+        }while (true);
+        cout<<endl<<endl;
+        //Impresión: historial total de la <materia> 
+        for (int i=0;i<estudiante.numMateriasInscritas;i++){
+            if (buscador==estudiante.materias[i].codigo){
+                cout<< "El historial total de tareas en la materia "<<estudiante.materias[i].nombre<<" es: "<<endl<<endl<<endl;
+            }
+        }
+
+        //Impresión de cada tarea
+        cout<<"Tareas: "<<endl<<endl;
+        for (int i=0;i<contadorTarea;i++){
+            if (buscador== tarea[i].curso){
+                numTarea++;
+                cout<<"Tarea "<<numTarea<<": "<< tarea[i].nombre<<endl;
+                cout<<"Fecha de entrega: "<<tarea[i].dia<<"/"<<tarea[i].mes<<"/"<<tarea[i].anio<<endl;
+                cout<<"Estado actual: "<<tarea[i].estado<<endl<<endl;
+                contadorTareasActuales++;
+            }
+        }
+        //Impresión si no ha creado ninguna tarea en esa materia o si ha eliminado todas las tareas en esa materia
+        if (contadorTareasActuales==0){
+            cout<< "\n\nNo tienes ninguna tarea en esta materia: ";
+        }
+        numTarea=0;
+
+        //Impresión de las tareas eliminadas
+        cout<< endl<<endl<<"Tareas eliminadas: "<<endl<<endl;
+        for (int i=0;i<contadorEliminado;i++){
+            if (buscador==TareaEliminada[i].curso){
+                numTarea++;
+                cout<<"Tarea "<<numTarea<<": "<< TareaEliminada[i].nombre<<endl;
+                contadorTareasEliminadas++;
+            } 
+        }
+
+        //Condición en caso de que no haya eliminado ninguna tarea en esa materia
+        cout << "\n\n";
+        if (contadorTareasEliminadas==0){
+            cout << "\n\nNo tienes ninguna tarea eliminada en esta materia.\n\n ";
+        }
+        system("PAUSE");
+    }
 }
