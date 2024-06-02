@@ -179,8 +179,8 @@ main() {
                 break;
 
             case 5:
-                condicionEliminar=eliminarTarea( tareas, tareaEliminada,  contadorTarea,  contadorEliminado);
-                if (condicionEliminar==0){
+                condicionEliminar = eliminarTarea( tareas, tareaEliminada,  contadorTarea,  contadorEliminado);
+                if (condicionEliminar == 0){
                 }else{
                     contadorTarea--;
                     cout << contadorEliminado<< endl;
@@ -443,30 +443,21 @@ int crearTarea(Estudiante &estudiante, Tarea tareas[], int contadorTarea){
 int crearNTareas(Estudiante &estudiante, Tarea tareas[100], int contadorTarea){
 
     string repeticion = "s";
-    int contador;
     while(repeticion == "s" && contadorTarea < 100) {
         
-        crearTarea(estudiante, tareas, contadorTarea);
+        contadorTarea = crearTarea(estudiante, tareas, contadorTarea);
         cambiarColorTexto(1);
         cout << "¿Desea agregar otra tarea? s/n: ";
-        contador=0;
-        do{ 
-            if (contador==0){
-                cambiarColorTexto(7);
-                cin >> repeticion;
-                cout<<endl<<endl;
-            }else{
+        cambiarColorTexto(7);
+        cin >> repeticion;
+        cout<<endl<<endl;
+        while (repeticion!="s" && repeticion!="n"){ 
                 cambiarColorTexto(4);
                 cout<<"Solo se puede ingresar 's' o 'n': ";
                 cambiarColorTexto(7);
                 cin>>repeticion;
                 cout<<endl<<endl;
-            }
-            if (repeticion=="s"||repeticion=="n"){
-                break;
-            }
-            contador++;
-        }while (true);
+        };
     }
 
     cambiarColorTexto(3);
@@ -1010,7 +1001,7 @@ string obtenercodigo(){
 
 int indiceTarea(Tarea tareas[], int contadorTarea) {
     int  tareaModificar;
-    cout << "\nEscoja la tarea donde se realizarán los cambios.\n"<<contadorTarea<<endl;
+    cout << "\nEscoja la tarea donde se realizarán los cambios, cuanta con "<<contadorTarea<< "tarea(s)" <<endl;
 
     for (int i=0; i < contadorTarea; i++) {
         cout << endl << i+1 << ". " << tareas[i].nombre << endl;
@@ -1029,13 +1020,13 @@ int indiceTarea(Tarea tareas[], int contadorTarea) {
 }
 
 int indiceTareaEstado(Tarea tareas[], int contadorTarea) {
-    int i, opcion, tareaModificar, indiceTarea, tareasSinModificar = 0;
+    int tareaModificar, tareasSinModificar = 0;
     do
     {
         cout << "\nEscoja la tarea donde se realizarán los cambios.\n";
 
         //Mostrar tareas
-        for (i=0; i < contadorTarea; i++) {
+        for (int i=0; i < contadorTarea; i++){
             cout << endl << i+1 << ". " << tareas[i].nombre << endl;
         }
 
@@ -1050,36 +1041,33 @@ int indiceTareaEstado(Tarea tareas[], int contadorTarea) {
             cin >> tareaModificar;
         }
 
-        if (tareas[tareaModificar-1].estado != "En proceso")
-            {
-                system("CLS");
-                if (tareas[tareaModificar-1].estado == "Entregada")
-                {
-                    cout << "La tarea ya ha sido entregada." << "\nLa nota es " << tareas[tareaModificar-1].nota << ".\n";
-                }
-                else {
-                    cout << "La tarea no fue entregada." << "\nLa nota es " << tareas[tareaModificar-1].nota << ".\n";
-                }
+    //Obtener indice de tarea
+    tareaModificar--;
+    if (tareas[tareaModificar].estado != "En proceso"){
+            system("CLS");
+            if (tareas[tareaModificar-1].estado == "Entregada"){
+                cout << "La tarea ya ha sido entregada." << "\nLa nota es " << tareas[tareaModificar].nota << ".\n";
+            }else {
+                cout << "La tarea no fue entregada." << "\nLa nota es " << tareas[tareaModificar].nota << ".\n";
+            }
 
-                for (i = 0; i < contadorTarea; i++)
-                {
-                    if (tareas[i].estado == "En proceso")
-                    {
-                        tareasSinModificar++;
-                    }
-
-                }
-
-
-                if ( tareasSinModificar == 0) {
-                    cout << "Agregue otra tarea para realizar cambios en el estado.\n";
-                    system("PAUSE");
-                    tareaModificar = 0;
-                    break;
+            for (int i = 0; i < contadorTarea; i++){
+                if (tareas[i].estado == "En proceso"){
+                    tareasSinModificar++;
                 }
 
             }
-    } while (tareas[tareaModificar-1].estado != "En proceso");
+
+
+            if ( tareasSinModificar == 0) {
+                cout << "Agregue otra tarea para realizar cambios en el estado.\n";
+                system("PAUSE");
+                tareaModificar = 0;
+                break;
+            }
+
+        }
+    } while (tareas[tareaModificar].estado != "En proceso");
 
     return tareaModificar;
 
@@ -1230,7 +1218,6 @@ int obtenerMes(int anio){
     cout << "Ingrese el número del mes: ";
     cambiarColorTexto(7);
     cin>>mes;
-    int x=0;
 
     while (cin.fail() || mes < mesMinimo || mes > 12){
         cin.clear();
@@ -1333,7 +1320,7 @@ int eliminarTarea(Tarea tarea[],Tarea TareaEliminada[], int contadorTarea, int c
         cambiarColorTexto(1);
         cout << "\nLa tarea que eliminaste es: "<< endl;
         cambiarColorTexto(8);
-        cout << endl << "       Tarea " << numTarea+1 << ": " << tarea[numTarea].nombre;
+        cout << endl << "       Tarea " << numTarea+1 << ": " << tarea[numTarea].nombre << endl;
 
         TareaEliminada[contadorEliminado]=tarea[numTarea];//Asignamos un nuevo vector donde en un futuro se establecerán todas las tareas eliminadas
 
@@ -1341,9 +1328,7 @@ int eliminarTarea(Tarea tarea[],Tarea TareaEliminada[], int contadorTarea, int c
             if (i != contadorTarea - 1){
                 tarea[i] = tarea[i + 1];
             }
-        }   
-
-        //En el último ciclo del for, el bucle no hará nada, para que se deje la última tarea quieta, hasta acá la tarea n y la tarea n-1 serán iguales
+        }//En el último ciclo del for, el bucle no hará nada, para que se deje la última tarea quieta, hasta acá la tarea n y la tarea n-1 serán iguales
 
         condicionEliminar=1;
         //Finalmente en el main() se declará que el contador eliminado(contador que cuenta cuantas tareas se han eliminado) aumenta uno, y el contador de las tareas disminuye en uno
