@@ -12,6 +12,7 @@ Fecha: 5 de Junio
 #include <fstream>
 #include <windows.h>
 
+
 using namespace std;
 
 //REGISTROS 
@@ -123,7 +124,7 @@ main() {
         system("PAUSE");
     }
 
-    if (leerTareasDesdeFichero(tareas, contadorTarea) && leerTareasEliminadasDesdeFichero(tareaEliminada, contadorEliminado)){
+    if (leerTareasDesdeFichero(tareas, contadorTarea) && contadorTarea > 0 && leerTareasEliminadasDesdeFichero(tareaEliminada, contadorEliminado)){
         system("CLS");
         cambiarColorTexto(2);
         cout << contadorTarea << " Tarea(s) han sido cargadas exitosamente.\n";
@@ -754,6 +755,7 @@ void modificarTarea(Tarea tareas[], int contadorTarea) {
             }
     }
     else {
+        cambiarColorTexto(6);
         cout << "Primero debe ingresar alguna tarea.\n";
         system("PAUSE");
     }
@@ -764,82 +766,90 @@ void buscarFechaTarea(Tarea tareas[], int contadorTarea) {
     int tareasCoinciden = 0,  diaTarea, mesTarea, anioTarea, i;
     system("CLS");
 
-    while(repeticion == "s") {
-        tareasCoinciden = 0;
-        diaTarea=obtenerDia(12,2024);
-        for (i = 0; i < contadorTarea; i++)
-        {
-            if ( tareas[i].dia == diaTarea) {
-                cambiarColorTexto(1);
-                cout << "Ingrese el mes a buscar de la tarea: ";
-                cambiarColorTexto(7);
-                cin >> mesTarea;
-                while (cin.fail() || mesTarea < 1 || mesTarea > 12){
-                    cin.clear();
-                    cin.ignore();
-                    cambiarColorTexto(4);
-                    cout << "Ingrese un mes válido. Intente nuevamente: ";
+    if(contadorTarea > 0) {
+        while(repeticion == "s") {
+            tareasCoinciden = 0;
+            diaTarea=obtenerDia(12,2024);
+            for (i = 0; i < contadorTarea; i++)
+            {
+                if ( tareas[i].dia == diaTarea) {
+                    cambiarColorTexto(1);
+                    cout << "Ingrese el mes a buscar de la tarea: ";
                     cambiarColorTexto(7);
                     cin >> mesTarea;
-                }
-                if ( tareas[i].mes == mesTarea) {
-                    cambiarColorTexto(1);
-                    cout << "Ingrese el anio a buscar de la tarea: ";
-                    cambiarColorTexto(7);
-                    cin >> anioTarea;
-                    while (cin.fail() || anioTarea <= 0 ){
+                    while (cin.fail() || mesTarea < 1 || mesTarea > 12){
                         cin.clear();
                         cin.ignore();
                         cambiarColorTexto(4);
-                        cout << "Ingrese un anio válido. Intente nuevamente: ";
+                        cout << "Ingrese un mes válido. Intente nuevamente: ";
+                        cambiarColorTexto(7);
+                        cin >> mesTarea;
+                    }
+                    if ( tareas[i].mes == mesTarea) {
+                        cambiarColorTexto(1);
+                        cout << "Ingrese el anio a buscar de la tarea: ";
                         cambiarColorTexto(7);
                         cin >> anioTarea;
-                    }
-                    if (tareas[i].anio == anioTarea)
-                    {
-                        cambiarColorTexto(5);
-                        cout << endl << "Tareas que coinciden con la busqueda. \n";
-                        cout << endl << "Nombre de la tarea "<< i+1 << ": " << tareas[i].nombre << endl;
-                        cout << "Descripcion: " << tareas[i].descripcion << endl;
-                        cout << "Estado: " << tareas[i].estado << endl;
-                        cout << "Curso: " << tareas[i].curso << endl;
-                        cout << "Codigo: " << tareas[i].codigoTarea << endl;
-                        cout << "Año de entrega: " << tareas[i].anio << endl;
-                        cout << "Mes de entrega: " << tareas[i].mes << endl;
-                        cout << endl;
-                        tareasCoinciden++;
-                    }
+                        while (cin.fail() || anioTarea <= 0 ){
+                            cin.clear();
+                            cin.ignore();
+                            cambiarColorTexto(4);
+                            cout << "Ingrese un anio válido. Intente nuevamente: ";
+                            cambiarColorTexto(7);
+                            cin >> anioTarea;
+                        }
+                        if (tareas[i].anio == anioTarea)
+                        {
+                            cambiarColorTexto(5);
+                            cout << endl << "Tareas que coinciden con la busqueda. \n";
+                            cout << endl << "Nombre de la tarea "<< i+1 << ": " << tareas[i].nombre << endl;
+                            cout << "Descripcion: " << tareas[i].descripcion << endl;
+                            cout << "Estado: " << tareas[i].estado << endl;
+                            cout << "Curso: " << tareas[i].curso << endl;
+                            cout << "Codigo: " << tareas[i].codigoTarea << endl;
+                            cout << "Año de entrega: " << tareas[i].anio << endl;
+                            cout << "Mes de entrega: " << tareas[i].mes << endl;
+                            cout << endl;
+                            tareasCoinciden++;
+                        }
 
+                    }
                 }
             }
-        }
 
-        if (tareasCoinciden == 0) {
+            if (tareasCoinciden == 0) {
+                cambiarColorTexto(1);
+                cout << endl << "Ninguna tarea coincide con el criterio de búsqueda.\n";
+            }
             cambiarColorTexto(1);
-            cout << endl << "Ninguna tarea coincide con el criterio de búsqueda.\n";
-        }
-        cambiarColorTexto(1);
-        cout << "¿Desea buscar otra tarea? s/n: ";
-        int contador=0;
-        do{ 
-            if (contador==0){
-                cambiarColorTexto(7);
-                cin >> repeticion;
-                cout<<endl<<endl;
-            }else{
-                cambiarColorTexto(4);
-                cout<<"Solo se puede ingresar 's' o 'n': ";
-                cambiarColorTexto(7);
-                cin>>repeticion;
-                cout<<endl<<endl;
-            }
-            if (repeticion=="s"||repeticion=="n"){
-                break;
-            }
-            contador++;
-        }while (true);
-        cout << endl;
+            cout << "¿Desea buscar otra tarea? s/n: ";
+            int contador=0;
+            do{ 
+                if (contador==0){
+                    cambiarColorTexto(7);
+                    cin >> repeticion;
+                    cout<<endl<<endl;
+                }else{
+                    cambiarColorTexto(4);
+                    cout<<"Solo se puede ingresar 's' o 'n': ";
+                    cambiarColorTexto(7);
+                    cin>>repeticion;
+                    cout<<endl<<endl;
+                }
+                if (repeticion=="s"||repeticion=="n"){
+                    break;
+                }
+                contador++;
+            }while (true);
+            cout << endl;
 
+        }
+
+    }
+    else {
+        cambiarColorTexto(6);
+        cout << "No ha ingresado ninguna tarea. Por lo tanto no tiene ningún historial.\n";
+        system("PAUSE");
     }
 }
 
