@@ -374,7 +374,7 @@ int crearTarea(Estudiante &estudiante, Tarea tareas[], int contadorTarea){
 
     cin.ignore();
 
-    cambiarColorTexto(1);
+    cambiarColorTexto(2);
     cout << "Tarea " << contadorTarea + 1<< endl;
     cout << "--------------------\n";
 
@@ -417,7 +417,7 @@ int crearTarea(Estudiante &estudiante, Tarea tareas[], int contadorTarea){
         }
     }while (!codigoValido);
 
-    cambiarColorTexto(1);
+    cambiarColorTexto(2);
 
     cout << "\nFecha de entrega de la tarea.\n";
     cout << "--------------------\n";
@@ -585,6 +585,7 @@ void modificarTarea(Tarea tareas[], int contadorTarea) {
     int decision = 0, opcion, indice, opcionFecha;
 
     if ( contadorTarea > 0 ) {
+            cambiarColorTexto(5);
             cout << "Modificar tarea.\n";
             cout << "--------------------\n";
             indice = indiceTarea(tareas, contadorTarea) - 1;
@@ -740,6 +741,8 @@ void modificarTarea(Tarea tareas[], int contadorTarea) {
                     break;
 
                 case 5:
+                    system("CLS");
+                    cambiarColorTexto(5);
                     cout << "Modificar tarea.\n";
                     cout << "--------------------\n";
                     indiceTarea(tareas, contadorTarea);
@@ -872,7 +875,6 @@ void cambiarEstadoTarea(Tarea tareas[], int contadorTarea) {
         while (decision1 == 0)
         {
             system("CLS");
-            cout << indice << endl;
             cout << "Opciones.\n";
             cout << "--------------------\n";
 
@@ -950,6 +952,7 @@ void cambiarEstadoTarea(Tarea tareas[], int contadorTarea) {
         }
     }
     else {
+        cambiarColorTexto(6);
         cout << "Primero debe ingresar alguna tarea.\n";
         system("PAUSE");
     }
@@ -988,6 +991,7 @@ string obtenercodigo(){
         //Verificar que se hayan ingresado digitos
         for (int i = 0; i < codigo.length(); i++){
             if(!isdigit(codigo[i])){
+                cambiarColorTexto(4);
                 cout << "Solamente recibe codigos como números naturales, ingrese nuevamente el código: ";
                 soloNumeros = false;
                 break;
@@ -1002,8 +1006,10 @@ string obtenercodigo(){
 
 int indiceTarea(Tarea tareas[], int contadorTarea) {
     int  tareaModificar;
-    cout << "\nEscoja la tarea donde se realizarán los cambios, cuanta con "<<contadorTarea<< "tarea(s)" <<endl;
+    cambiarColorTexto(2);
+    cout << "\nEscoja la tarea donde se realizarán los cambios, cuenta con "<<contadorTarea<< " tarea(s)." <<endl;
 
+    cambiarColorTexto(8);
     for (int i=0; i < contadorTarea; i++) {
         cout << endl << i+1 << ". " << tareas[i].nombre << endl;
     }
