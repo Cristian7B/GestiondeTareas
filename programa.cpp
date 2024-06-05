@@ -992,7 +992,7 @@ void buscarFechaTarea(Tarea tareas[], int contadorTarea) {
 }
 
 void cambiarEstadoTarea(Tarea tareas[], int contadorTarea) {
-    int i, opcion, indice, decision1 = 0, caracteres;
+    int opcion, indice, decision1 = 0;
     float nota;
     string estado, lower;
 
