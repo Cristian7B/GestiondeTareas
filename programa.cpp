@@ -311,6 +311,18 @@ main() {
 
             case 0:
                 decision = false;
+                system("cls");
+                cout << "  ****  *****   ***   ****   ****  *****      *****   ***   ****  ****    \n";
+                cout << " *      *      *   *  *   * *        *       *       *   *  *   * *   *   \n";
+                cout << " *  **  *****  *****  ****   ***     *       *  ***  *****  ****  *   *   \n";
+                cout << " *   *  *      *   *  *  *      *    *       *    *  *   *  *  *  *   *   \n";
+                cout << "  ****  *****  *   *  *   * ****     *        *****  *   *  *   * ****    \n";
+                cout << "                                                                        \n";
+                cout << "  ****   ***   ****   *   * *****  *****  *****  *****                   \n";
+                cout << " *      *   *  *   *  *   *   *      *      *    *                       \n";
+                cout << "  ***   *   *  *   *  *   *   *      *      *    *****                   \n";
+                cout << "     *  *   *  *   *  *   *   *      *      *        *                   \n";
+                cout << " ****    ***   ****    ***    *      *      *    *****                   \n";
                 break;
 
             default:
@@ -996,7 +1008,7 @@ void buscarFechaTarea(Tarea tareas[], int contadorTarea) {
 }
 
 void cambiarEstadoTarea(Tarea tareas[], int contadorTarea) {
-    int i, opcion, indice, decision1 = 0, caracteres;
+    int opcion, indice, decision1 = 0;
     float nota;
     string estado, lower;
 
@@ -1419,10 +1431,30 @@ int obtenerDia(int mes, int anio){
 
     //Obtener último día del mes
     switch(mes){
-        case 1 || 3 || 5 || 7 || 8 || 10 || 12:
+        //Meses de 31 días
+        case 1:
             ultimoDiaDelMes = 31;
-
             break;
+        case 3:
+            ultimoDiaDelMes = 31;
+            break;
+        case 5:
+            ultimoDiaDelMes = 31;
+            break;
+        case 7:
+            ultimoDiaDelMes = 31;
+            break;
+        case 8:
+            ultimoDiaDelMes = 31;
+            break;
+        case 10:
+            ultimoDiaDelMes = 31;
+            break;
+        case 12:
+            ultimoDiaDelMes = 31;
+            break;
+
+        //Febrero
         case 2:
             //Revisar si el año es bisiesto
             if (anio % 4 == 0){
@@ -1430,10 +1462,11 @@ int obtenerDia(int mes, int anio){
             }else{
                 ultimoDiaDelMes = 28;
             }
-
             break;
+        //Otros meses 
         default:
             ultimoDiaDelMes = 30;
+            break;
     }
 
     cambiarColorTexto(1);
@@ -1535,7 +1568,7 @@ void historialTareas(Tarea tarea[],Tarea TareaEliminada[],int contadorTarea,int 
         system("PAUSE");
     }else if(contadorTarea==0 && contadorEliminado!=0){ //Condición si no existe ninguna tarea, pero si has eliminado tareas
         cambiarColorTexto(6);
-        cout<< "No tienes ninguna tarea actualmente, sin embargo, puedes buscar que tareas has eliminado en las siguientes materias: ";
+        cout<< "No tienes ninguna tarea actualmente, sin embargo, puedes buscar que tareas has eliminado (las tareas eliminadas no tienen nota) en las siguientes materias: ";
         cout<<endl<<endl;
         cambiarColorTexto(15);
         cout << left << setw(20) << "Materia" << setw(10) << "Código" << endl;
@@ -1575,6 +1608,9 @@ void historialTareas(Tarea tarea[],Tarea TareaEliminada[],int contadorTarea,int 
             if (buscador==TareaEliminada[i].curso){ //Condición en caso de que el buscador sea igual al código de curso que le asignamos al crear la tarea
                 numTarea++;
                 cout<<"Tarea "<<numTarea<<": "<< TareaEliminada[i].nombre<<endl;
+                cout<<"Código: "<<TareaEliminada[i].codigoTarea<< endl<<endl;
+                cout<<"Fecha: "<<TareaEliminada[i].dia<<"/"<<TareaEliminada[i].mes<<"/"<<TareaEliminada[i].anio<<endl;
+                cout<<"Debes recordar que las tareas eliminadas no tienen ningún estado, ni nota.\n\n";
                 contadorTareasEliminadas++;
             }  
         }
@@ -1620,7 +1656,7 @@ void historialTareas(Tarea tarea[],Tarea TareaEliminada[],int contadorTarea,int 
         }while (true);
         cout<<endl<<endl;
         //Impresión: historial total de la <materia> 
-        cambiarColorTexto(1);
+        cambiarColorTexto(6);
         for (int i=0;i<estudiante.numMateriasInscritas;i++){
             if (buscador==estudiante.materias[i].codigo){
                 cambiarColorTexto(6);
@@ -1636,8 +1672,17 @@ void historialTareas(Tarea tarea[],Tarea TareaEliminada[],int contadorTarea,int 
             if (buscador== tarea[i].curso){
                 numTarea++;
                 cout<<"Tarea "<<numTarea<<": "<< tarea[i].nombre<<endl;
+                cout<<"Código: "<<tarea[i].codigoTarea<<endl; 
                 cout<<"Fecha de entrega: "<<tarea[i].dia<<"/"<<tarea[i].mes<<"/"<<tarea[i].anio<<endl;
-                cout<<"Estado actual: "<<tarea[i].estado<<endl<<endl;
+                cout<<"Estado actual: "<<tarea[i].estado<<endl;
+                if (tarea[i].estado=="Entregado"){
+                    cout<<"Nota: "<<tarea[i].nota;
+                }else if(tarea[i].estado=="En proceso"){
+                    cout<<"Esta tarea no tiene nota aún porque no se ha entregado";
+                }else{
+                    cout<<"Nota: "<<"0 (no fue entregada esta tarea)";
+                }
+
                 contadorTareasActuales++;
             }
         }
@@ -1656,6 +1701,9 @@ void historialTareas(Tarea tarea[],Tarea TareaEliminada[],int contadorTarea,int 
             if (buscador==TareaEliminada[i].curso){
                 numTarea++;
                 cout<<"Tarea "<<numTarea<<": "<< TareaEliminada[i].nombre<<endl;
+                cout<<"Código: "<<TareaEliminada[i].codigoTarea<< endl<<endl;
+                cout<<"Fecha: "<<TareaEliminada[i].dia<<"/"<<TareaEliminada[i].mes<<"/"<<TareaEliminada[i].anio<<endl;
+                cout<<"Debes recordar que las tareas eliminadas no tienen ningún estado, ni nota.\n\n";
                 contadorTareasEliminadas++;
             } 
         }
