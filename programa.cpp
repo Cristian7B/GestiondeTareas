@@ -1411,9 +1411,30 @@ int obtenerDia(int mes, int anio){
 
     //Obtener último día del mes
     switch(mes){
-        case (1 || 3 || 5 || 7 || 8 || 10 || 12):
+        //Meses de 31 días
+        case 1:
             ultimoDiaDelMes = 31;
+            break;
+        case 3:
+            ultimoDiaDelMes = 31;
+            break;
+        case 5:
+            ultimoDiaDelMes = 31;
+            break;
+        case 7:
+            ultimoDiaDelMes = 31;
+            break;
+        case 8:
+            ultimoDiaDelMes = 31;
+            break;
+        case 10:
+            ultimoDiaDelMes = 31;
+            break;
+        case 12:
+            ultimoDiaDelMes = 31;
+            break;
 
+        //Febrero
         case 2:
             //Revisar si el año es bisiesto
             if (anio % 4 == 0){
@@ -1421,10 +1442,11 @@ int obtenerDia(int mes, int anio){
             }else{
                 ultimoDiaDelMes = 28;
             }
-
-            
+            break;
+        //Otros meses 
         default:
             ultimoDiaDelMes = 30;
+            break;
     }
 
     cambiarColorTexto(1);
