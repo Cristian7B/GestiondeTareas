@@ -110,8 +110,8 @@ main() {
     cambiarColorTexto(8);
 
     cout << "+%@@@@@%%%%%###***+++==----=*@@*:.      \n";
-    cout << "@@@#                  .=%@#=.    \n";
-    cout << "@@@@@*:       .......:::::-----=#@@@*-. \n";
+    cout << "@@@#                         .=%@#=.    \n";
+    cout << "@@@@@*:                    -----=#@@@*-. \n";
     cout << "@@@@@@@%####%%%%%@@@@@@@@@@@@@@@@@@@@@: \n";
     cout << "@@@@@@@@@%%###****+++===----:::::..+@@- \n";
     cout << "@@@@@@@%.                          -@@- \n";
@@ -190,6 +190,8 @@ main() {
     cout << "    .+@@%*####%%%%@@@@@@@@@@@@@@@@@@@#. \n";
     cout << "      -%@@@@@@%%%%###***+++===----::.   \n";
     cout << endl;
+    cambiarColorTexto(5);
+    cout << "Bienvenido a tu Sistema de Gestion de Tareas.\n";
     system("PAUSE");
     system("CLS");
 
@@ -209,10 +211,15 @@ main() {
 
     leerTareasEliminadasDesdeFichero(tareaEliminada, contadorEliminado);
 
-    if (leerTareasDesdeFichero(tareas, contadorTarea) && contadorTarea > 0 && leerTareasEliminadasDesdeFichero(tareaEliminada, contadorEliminado)){
+    if (leerTareasDesdeFichero(tareas, contadorTarea) && contadorTarea > 0 ){
         system("CLS");
         cambiarColorTexto(2);
         cout << contadorTarea << " Tarea(s) han sido cargadas exitosamente.\n";
+        if(contadorEliminado == 0) {
+            system("PAUSE");
+        }
+    }
+    if (leerTareasEliminadasDesdeFichero(tareaEliminada, contadorEliminado) && contadorEliminado >0 ) {
         cambiarColorTexto(4);
         cout << contadorEliminado << " Tarea(s) eliminadas han sido cargadas exitosamente.\n";
         system("PAUSE");
@@ -248,6 +255,15 @@ main() {
         cout << "\nOpcion: ";
         cambiarColorTexto(7);
         cin >> opcion;
+        while (cin.fail() || opcion < 0|| opcion > 7)
+        {
+            cin.clear();
+            cin.ignore();
+            cambiarColorTexto(4);
+            cout << "\nIngrese una opción válida. Intente nuevamente: ";
+            cambiarColorTexto(7);
+            cin >> opcion;
+        }
 
         switch (opcion) {
             case 1:
@@ -994,6 +1010,10 @@ void cambiarEstadoTarea(Tarea tareas[], int contadorTarea) {
 
         indice = indiceTareaEstado(tareas, contadorTarea);
 
+        if (tareas[indice].estado == "Entregada" || tareas[indice].estado == "No Entregada") {
+            decision1 = 1;
+        }
+
         while (decision1 == 0)
         {
             system("CLS");
@@ -1147,7 +1167,7 @@ string obtenercodigo(){
 
 int indiceTarea(Tarea tareas[], int contadorTarea) {
     int  tareaModificar;
-    cambiarColorTexto(15);
+    cambiarColorTexto(6);
     cout << "\nEscoja la tarea donde se realizarán los cambios, cuenta con "<<contadorTarea<< " tarea(s)." <<endl;
 
     cambiarColorTexto(8);
@@ -1200,7 +1220,7 @@ int indiceTareaEstado(Tarea tareas[], int contadorTarea) {
         tareaModificar--;
         if (tareas[tareaModificar].estado != "En proceso"){
                 system("CLS");
-                if (tareas[tareaModificar-1].estado == "Entregada"){
+                if (tareas[tareaModificar].estado == "Entregada"){
                     cambiarColorTexto(2);
                     cout << "La tarea ya ha sido entregada." << "\nLa nota es " << tareas[tareaModificar].nota << ".\n";
                 }else {
@@ -1506,11 +1526,8 @@ int eliminarTarea(Tarea tarea[],Tarea TareaEliminada[], int contadorTarea, int c
 }
 
 void historialTareas(Tarea tarea[],Tarea TareaEliminada[],int contadorTarea,int contadorEliminado, Estudiante &estudiante){
-
-    //Para esta función es importante tener en cuenta que anteriormente ya habíamos validado que el ingreso del código del curso en una tarea, concuerde con algún curso.
-
     system("CLS");
-    string buscador;    //Se declara buscador, porque ahorita se le pedirá al usuario que materia quiere ver el historial, preguntandole el código de la materia
+    string buscador;    //Se declara buscador
     int numTarea=0, contadorTareasEliminadas=0, contadorTareasActuales=0;
     if (contadorTarea==0 && contadorEliminado==0){  //Condición si no existe ninguna tarea, ni ninguna tarea eliminada
         cambiarColorTexto(4);
